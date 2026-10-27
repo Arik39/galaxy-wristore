@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Galaxy Wristore · Watch Pass & Board · Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#0B0D10; --slate:#1C2127; --steel:#8C939C; --panel:#E6E8EB; --white:#FFFFFF; --alert:#FFD400; --rule:#2C333B; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { width:390px; height:844px; overflow:hidden; background:var(--ink); color:var(--white);
+    font-family:"Barlow", -apple-system, system-ui, sans-serif; font-feature-settings:"tnum" 1; }
+  ::selection { background:var(--alert); color:var(--ink); }
+  .cond { font-family:"Barlow Condensed", sans-serif; }
+  .status { height:47px; display:flex; justify-content:space-between; align-items:center; padding:12px 28px 0 34px; font-weight:600; font-size:16px; }
+  header { padding:2px 20px 12px; display:flex; justify-content:space-between; align-items:baseline; }
+  h1 { font-family:"Barlow Condensed", sans-serif; font-size:36px; line-height:40px; font-weight:700; letter-spacing:-0.01em; }
+  header span { font-size:14px; color:var(--steel); }
+  .pass { margin:0 14px; background:var(--white); color:var(--ink); border-radius:14px; overflow:hidden; position:relative; }
+  .pass .top { display:flex; justify-content:space-between; align-items:center; padding:14px 16px 10px; font-size:13px; color:#545A62; }
+  .pass .top b { color:var(--ink); font-weight:600; }
+  .face { display:flex; align-items:center; gap:14px; padding:2px 16px 14px; }
+  .face .thumb { width:64px; height:64px; border-radius:50%; background:radial-gradient(circle at 50% 38%, #2C3036, #0D0E10 72%); flex:none; position:relative; }
+  .face .thumb i { position:absolute; left:50%; top:50%; background:#EEE; transform-origin:50% 100%; border-radius:1px; }
+  .face .thumb .h { width:3px; height:15px; margin:-15px 0 0 -1.5px; transform:rotate(300deg); }
+  .face .thumb .m { width:2px; height:23px; margin:-23px 0 0 -1px; transform:rotate(48deg); }
+  .face h2 { font-family:"Barlow Condensed", sans-serif; font-size:40px; line-height:40px; font-weight:700; letter-spacing:-0.01em; }
+  .face p { font-size:14px; color:#545A62; }
+  /* the tear line between the face and the facts */
+  .tear { height:0; border-top:2px dashed #C5C9CF; margin:0 12px; position:relative; }
+  .tear::before, .tear::after { content:""; position:absolute; top:-11px; width:20px; height:20px; border-radius:50%; background:var(--ink); }
+  .tear::before { left:-22px; } .tear::after { right:-22px; }
+  .seg { display:grid; grid-template-columns:repeat(3, 1fr); padding:12px 4px 14px; }
+  .seg div { padding:0 12px; border-left:1px solid #D7DADF; }
+  .seg div:first-child { border-left:0; }
+  .seg span { display:block; font-size:12px; color:#5C626A; }
+  .seg b { font-family:"Barlow Condensed", sans-serif; font-size:26px; font-weight:600; line-height:30px; }
+  .addr { display:flex; justify-content:space-between; align-items:center; padding:10px 16px 12px; background:var(--panel); font-size:14px; }
+  .addr b { font-weight:600; }
+  .board { margin:16px 14px 0; }
+  .board .hd { display:flex; justify-content:space-between; padding:0 2px 8px; font-size:13px; color:var(--steel); border-bottom:1px solid var(--rule); }
+  .r { display:grid; grid-template-columns:1fr auto; align-items:center; padding:11px 2px; border-bottom:1px solid var(--rule); }
+  .r p { font-size:16px; } .r p span { display:block; font-size:13px; color:var(--steel); }
+  .r em { font-style:normal; font-family:"Barlow Condensed", sans-serif; font-weight:600; font-size:16px; padding:3px 9px; border-radius:6px; background:var(--slate); color:#D5D9DE; }
+  .r.hold { background:linear-gradient(90deg, rgba(255,212,0,.12), rgba(255,212,0,0) 70%); }
+  .r.hold em { background:var(--alert); color:var(--ink); }
+  .r a { color:var(--alert); }
+  nav { position:absolute; left:0; width:390px; bottom:0; height:83px; background:#121519; border-top:1px solid var(--rule);
+    display:flex; justify-content:space-around; padding-top:7px; }
+  nav a { width:70px; display:flex; flex-direction:column; align-items:center; gap:3px; color:#7F8790; font-size:10.5px; font-weight:600; text-decoration:none; position:relative; }
+  nav a.on { color:var(--white); }
+  nav a.on::before { content:""; position:absolute; top:-8px; width:28px; height:3px; border-radius:2px; background:var(--alert); }
+  nav svg { width:26px; height:26px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+</style>
+</head>
+<body>
+  <div class="status"><span>9:41</span><span>Wi-Fi · 87%</span></div>
+  <header><h1>My Watch</h1><span>Galaxy Watch 46 mm</span></header>
+  <section class="pass">
+    <div class="top"><span><b>Connected</b> over Wi-Fi</span><span>SM-R800 · Tizen 5.5</span></div>
+    <div class="face">
+      <div class="thumb"><i class="h"></i><i class="m"></i></div>
+      <div><h2>GS Hybrid 7</h2><p>On your wrist now</p></div>
+    </div>
+    <div class="tear"></div>
+    <div class="seg">
+      <div><span>Battery</span><b>72%</b></div>
+      <div><span>Free</span><b>1.6 GB</b></div>
+      <div><span>Backed up</span><b>38/55</b></div>
+    </div>
+    <div class="addr"><span>Address</span><b>192.168.2.66</b></div>
+  </section>
+  <section class="board">
+    <div class="hd"><span>On the watch</span><span>Updated 9:41</span></div>
+    <div class="r hold"><p>2 faces not in a backup<span>Added since 11:47 today</span></p><em>Back up</em></div>
+    <div class="r"><p>GS Weather 8<span>From Tizen Archive · 2.4 MB</span></p><em>Queued</em></div>
+    <div class="r"><p>Samsung Weather<span>Built-in, updated</span></p><em>v5.0.78</em></div>
+    <div class="r"><p>3 newer versions<span>Tizen Archive</span></p><em>Review</em></div>
+    <div class="r"><p>Backup<span>38 apps, 5 files · Today, 11:47</span></p><em>Saved</em></div>
+  </section>
+  <nav>
+    <a class="on" href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/><path d="M9 5.8 9.6 2h4.8l.6 3.8M9 18.2l.6 3.8h4.8l.6-3.8M12 9.5V12l1.8 1.2"/></svg>Watch</a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="7.5" cy="7.5" r="4"/><circle cx="16.5" cy="7.5" r="4"/><circle cx="7.5" cy="16.5" r="4"/><circle cx="16.5" cy="16.5" r="4"/></svg>Faces</a>
+    <a href="#"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>Apps</a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>Discover</a>
+    <a href="#"><svg viewBox="0 0 24 24"><path d="M4 14v4.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V14M12 4v10m-4-4 4 4 4-4"/></svg>Backup</a>
+  </nav>
+</body>
+</html>

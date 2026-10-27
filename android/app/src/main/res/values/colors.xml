@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The app's near-black ground, so no white flash shows before the app draws. -->
+    <color name="stage">#09090A</color>
+</resources>

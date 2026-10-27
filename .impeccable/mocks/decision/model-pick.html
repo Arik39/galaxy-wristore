@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Galaxy Wristore · Night Showroom · Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --deep:#1B1640; --violet:#3E3384; --cyan:#7DE3F5; --alert:#E5484D; --ink:#F1EEFF; --soft:#B7B0E0; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { position:relative; width:390px; height:844px; overflow:hidden; color:var(--ink); font-family:-apple-system, system-ui, sans-serif;
+    background:radial-gradient(120% 60% at 50% 38%, #4A3D96 0%, #2A2260 45%, #17123A 75%, #100C2A 100%); }
+  ::selection { background:var(--cyan); color:var(--deep); }
+  .sora { font-family:"Sora", sans-serif; }
+  .status { height:47px; display:flex; justify-content:space-between; align-items:center; padding:12px 28px 0 34px; font-weight:600; font-size:16px; }
+  header { padding:2px 22px 0; }
+  h1 { font-family:"Sora", sans-serif; font-size:28px; line-height:34px; font-weight:700; letter-spacing:-0.02em; }
+  .cond { margin-top:10px; display:flex; justify-content:space-between; font-size:14px; color:var(--soft); }
+  .cond b { color:var(--ink); font-weight:600; }
+  .bar { margin-top:8px; height:4px; border-radius:2px; background:rgba(255,255,255,.14); }
+  .bar i { display:block; width:69%; height:100%; border-radius:2px; background:var(--cyan); }
+  .stage { position:relative; height:330px; perspective:1000px; }
+  .turn { position:absolute; left:50%; top:228px; width:300px; height:74px; margin-left:-150px; border-radius:50%;
+    background:radial-gradient(ellipse at 50% 40%, rgba(125,227,245,.35), rgba(125,227,245,.06) 55%, transparent 72%);
+    box-shadow:inset 0 0 0 1.5px rgba(125,227,245,.35); }
+  .wrap { position:absolute; left:0; right:0; top:0; height:270px; -webkit-box-reflect:below -60px linear-gradient(transparent 62%, rgba(255,255,255,.22)); }
+  .w { position:absolute; left:50%; top:126px; width:206px; height:206px; margin:-103px 0 0 -103px; transform-style:preserve-3d;
+    transform:rotateX(56deg) rotateZ(-28deg); animation:spin 14s linear infinite; }
+  @keyframes spin { to { transform:rotateX(56deg) rotateZ(332deg); } }
+  @media (prefers-reduced-motion: reduce) { .w { animation:none; } }
+  .strap { position:absolute; left:50%; width:116px; height:150px; margin-left:-58px; border-radius:28px; transform:translateZ(-12px); background:linear-gradient(90deg, #121018, #2B2838 45%, #16131F); }
+  .strap.t { bottom:132px; } .strap.b { top:132px; }
+  .edge { position:absolute; inset:0; border-radius:50%; background:linear-gradient(110deg, #C9D6FF, #8B8FA8 35%, #4D4F68 60%, #9FE6F2); }
+  .edge:nth-of-type(3) { transform:translateZ(-2px); } .edge:nth-of-type(4) { transform:translateZ(-4px); } .edge:nth-of-type(5) { transform:translateZ(-6px); }
+  .edge:nth-of-type(6) { transform:translateZ(-8px); } .edge:nth-of-type(7) { transform:translateZ(-10px); } .edge:nth-of-type(8) { transform:translateZ(-12px); filter:brightness(.7); }
+  .bezel { position:absolute; inset:0; border-radius:50%; transform:translateZ(1px);
+    background:radial-gradient(circle, transparent 0 82px, #23222D 83px 90px, transparent 91px),
+      repeating-conic-gradient(from -1deg, #DCDDF0 0 2deg, transparent 2deg 30deg),
+      repeating-conic-gradient(from -.5deg, #7C7E95 0 1deg, transparent 1deg 6deg), radial-gradient(circle at 35% 30%, #4A4A5E, #26252F 70%); }
+  .knurl { position:absolute; inset:0; border-radius:50%; transform:translateZ(1.5px); background:repeating-conic-gradient(#CBD0E6 0 1.5deg, #64667E 1.5deg 3deg);
+    -webkit-mask:radial-gradient(circle, transparent 0 96px, #000 97px 102px, transparent 103px); }
+  .dial { position:absolute; inset:22px; border-radius:50%; transform:translateZ(2px); background:radial-gradient(circle at 50% 36%, #2E3040, #0B0B12 72%); }
+  .dial .ix { position:absolute; inset:7px; border-radius:50%; background:repeating-conic-gradient(from -1.5deg, #F2F0FF 0 3deg, transparent 3deg 30deg);
+    -webkit-mask:radial-gradient(circle, transparent 0 58px, #000 59px 69px, transparent 70px); }
+  .dial i { position:absolute; left:50%; top:50%; background:#F4F2FF; border-radius:2px; transform-origin:50% 100%; }
+  .dial .h { width:5px; height:38px; margin:-38px 0 0 -2.5px; transform:rotate(300deg); } .dial .m { width:3.5px; height:58px; margin:-58px 0 0 -1.75px; transform:rotate(48deg); }
+  .key { position:absolute; width:20px; height:14px; border-radius:6px; background:linear-gradient(180deg, #DADCF0, #6B6E86); }
+  .key.k1 { left:191px; top:46px; transform:translateZ(-6px) rotate(-30deg); } .key.k2 { left:191px; top:146px; transform:translateZ(-6px) rotate(30deg); }
+  /* hotspots on the model with leader lines, like a car configurator */
+  .hot { position:absolute; width:12px; height:12px; border-radius:50%; background:var(--cyan); box-shadow:0 0 0 6px rgba(125,227,245,.2), 0 0 0 12px rgba(125,227,245,.08); z-index:3; }
+  .hot.alert { background:var(--alert); box-shadow:0 0 0 6px rgba(229,72,77,.25), 0 0 0 12px rgba(229,72,77,.1); }
+  .lead { position:absolute; height:1px; background:linear-gradient(90deg, rgba(125,227,245,.7), rgba(125,227,245,.15)); z-index:2; }
+  .lbl { position:absolute; z-index:3; font-size:13px; line-height:17px; color:var(--soft); }
+  .lbl b { display:block; font-family:"Sora", sans-serif; font-size:15px; color:var(--ink); font-weight:600; }
+  .tiles { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:0 16px; }
+  .tile { padding:14px; border-radius:18px; background:rgba(241,238,255,.08); border:1px solid rgba(255,255,255,.12);
+    backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px); font-size:13px; color:var(--soft); }
+  .tile b { display:block; margin-top:6px; font-family:"Sora", sans-serif; font-size:22px; font-weight:600; color:var(--ink); font-feature-settings:"tnum" 1; }
+  .tile.alert { background:rgba(229,72,77,.92); border-color:rgba(255,255,255,.2); color:#FFE9EA; }
+  .tile.alert b { font-size:16px; line-height:20px; color:#fff; }
+  .tile.alert a { display:inline-block; margin-top:8px; padding:6px 12px; border-radius:14px; background:#fff; color:#B4232A; font-weight:700; font-size:13px; text-decoration:none; }
+  nav { position:absolute; left:0; width:390px; bottom:0; height:83px; display:flex; justify-content:space-around; padding-top:8px;
+    background:rgba(16,12,42,.7); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-top:1px solid rgba(255,255,255,.08); }
+  nav a { width:70px; display:flex; flex-direction:column; align-items:center; gap:3px; color:#8C86B8; font-size:10.5px; font-weight:600; text-decoration:none; }
+  nav a.on { color:var(--cyan); }
+  nav svg { width:26px; height:26px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+</style>
+</head>
+<body>
+  <div class="status"><span>9:41</span><span>Wi-Fi · 87%</span></div>
+  <header>
+    <h1>My Watch</h1>
+    <div class="cond"><span><b>38 of 55</b> backed up</span><span>Connected · 192.168.2.66</span></div>
+    <div class="bar"><i></i></div>
+  </header>
+  <div class="stage">
+    <div class="turn"></div>
+    <div class="wrap">
+      <div class="w">
+        <div class="strap t"></div><div class="strap b"></div>
+        <div class="edge"></div><div class="edge"></div><div class="edge"></div><div class="edge"></div><div class="edge"></div><div class="edge"></div>
+        <div class="key k1"></div><div class="key k2"></div>
+        <div class="bezel"></div><div class="knurl"></div>
+        <div class="dial"><div class="ix"></div><i class="h"></i><i class="m"></i></div>
+      </div>
+    </div>
+    <span class="hot" style="left:120px;top:84px"></span><span class="lead" style="left:24px;top:90px;width:96px"></span>
+    <div class="lbl" style="left:22px;top:52px"><b>Bezel</b>9 faces</div>
+    <span class="hot" style="left:262px;top:118px"></span><span class="lead" style="left:274px;top:124px;width:70px"></span>
+    <div class="lbl" style="left:300px;top:132px"><b>Keys</b>29 apps</div>
+    <span class="hot alert" style="left:176px;top:196px"></span><span class="lead" style="left:40px;top:202px;width:136px;background:linear-gradient(270deg, rgba(229,72,77,.8), rgba(229,72,77,.15))"></span>
+    <div class="lbl" style="left:22px;top:210px"><b>Backup</b>2 faces missing</div>
+  </div>
+  <section class="tiles">
+    <div class="tile">Battery<b>72%</b></div>
+    <div class="tile">Storage<b>1.6 GB free</b></div>
+    <div class="tile">On the watch<b>GS Hybrid 7</b></div>
+    <div class="tile alert">Not in a backup<b>GS Hybrid 7, MD210</b><a href="#">Back up now</a></div>
+  </section>
+  <nav>
+    <a class="on" href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/><path d="M9 5.8 9.6 2h4.8l.6 3.8M9 18.2l.6 3.8h4.8l.6-3.8M12 9.5V12l1.8 1.2"/></svg>Watch</a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="7.5" cy="7.5" r="4"/><circle cx="16.5" cy="7.5" r="4"/><circle cx="7.5" cy="16.5" r="4"/><circle cx="16.5" cy="16.5" r="4"/></svg>Faces</a>
+    <a href="#"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>Apps</a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>Discover</a>
+    <a href="#"><svg viewBox="0 0 24 24"><path d="M4 14v4.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V14M12 4v10m-4-4 4 4 4-4"/></svg>Backup</a>
+  </nav>
+</body>
+</html>

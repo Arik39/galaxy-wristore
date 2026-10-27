@@ -1,0 +1,24 @@
+Galaxy Wristore
+Copyright 2026 The Galaxy Wristore authors
+
+This product is licensed under the Apache License 2.0 (see LICENSE).
+
+It includes software ported from Tizen Companion Installer
+(https://github.com/Tizen-Archive/tizen-companion-installer), Copyright 2026 Tizen Archive, licensed under the
+Apache License 2.0: the sdb protocol client, the Tizen package reader, the Tizen Archive client and the .twbackup
+backup format were translated from its Kotlin `core` and `cli` modules into Dart. Its NOTICE reads:
+
+    Tizen Companion Installer
+    Copyright 2026 Tizen Archive
+
+    This product includes software developed by third parties under the Apache License 2.0
+    (AndroidX, Jetpack Compose, Kotlin, kotlinx.coroutines, Android apksig) and the MIT License
+    (Bouncy Castle, used in tests only).
+
+The Archivo typeface (assets/fonts/Archivo-Variable.ttf) is Copyright 2020 The Archivo Project Authors and is
+licensed under the SIL Open Font License 1.1 (assets/fonts/OFL-Archivo.txt).
+
+The Dart and Flutter packages listed in pubspec.yaml are used under their own licences.
+
+Samsung, Galaxy, Galaxy Watch, Gear and Tizen are trademarks of their respective owners. This project is not
+affiliated with or endorsed by Samsung or the Linux Foundation.

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Galaxy Wristore · Full-Screen Feed · Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Antonio:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --void:#0A0A0A; --slate:#1E2026; --fog:#5A6472; --sand:#C7B9A6; --white:#FFFFFF; --soft:#C9CDD4; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { position:relative; width:390px; height:844px; overflow:hidden; color:var(--white); font-family:-apple-system, system-ui, sans-serif;
+    background:radial-gradient(90% 55% at 50% 40%, #2E3440 0%, #1E2026 40%, #0E0F12 80%, #0A0A0A 100%); }
+  ::selection { background:var(--sand); color:var(--void); }
+  .status { position:relative; z-index:4; height:47px; display:flex; justify-content:space-between; align-items:center; padding:12px 28px 0 34px; font-weight:600; font-size:16px; }
+  .tabs { position:relative; z-index:4; display:flex; justify-content:center; gap:22px; margin-top:6px; font-size:16px; font-weight:600; color:rgba(255,255,255,.6); }
+  .tabs .on { color:#fff; position:relative; }
+  .tabs .on::after { content:""; position:absolute; left:20%; right:20%; bottom:-7px; height:2.5px; border-radius:2px; background:#fff; }
+  .stage { position:absolute; left:0; top:96px; width:390px; height:460px; perspective:1200px; }
+  .w { position:absolute; left:50%; top:50%; width:270px; height:270px; margin:-135px 0 0 -150px; transform-style:preserve-3d;
+    transform:rotateX(26deg) rotateY(-30deg) rotateZ(-8deg); animation:turn 12s ease-in-out infinite alternate; }
+  @keyframes turn { to { transform:rotateX(18deg) rotateY(-12deg) rotateZ(-4deg); } }
+  @media (prefers-reduced-motion: reduce) { .w { animation:none; } }
+  .strap { position:absolute; left:50%; width:150px; height:230px; margin-left:-75px; border-radius:34px; transform:translateZ(-14px); background:linear-gradient(90deg, #121318, #30333C 45%, #16171C); }
+  .strap.t { bottom:180px; } .strap.b { top:180px; }
+  .edge { position:absolute; inset:0; border-radius:50%; background:linear-gradient(110deg, #E8E2D6, #9A9EA6 35%, #4E525C 62%, #B9C3D2); }
+  .edge:nth-of-type(3) { transform:translateZ(-2.5px); } .edge:nth-of-type(4) { transform:translateZ(-5px); } .edge:nth-of-type(5) { transform:translateZ(-7.5px); }
+  .edge:nth-of-type(6) { transform:translateZ(-10px); } .edge:nth-of-type(7) { transform:translateZ(-12.5px); } .edge:nth-of-type(8) { transform:translateZ(-14px); filter:brightness(.7); }
+  .bezel { position:absolute; inset:0; border-radius:50%; transform:translateZ(1px);
+    background:radial-gradient(circle, transparent 0 108px, #25272D 109px 118px, transparent 119px),
+      repeating-conic-gradient(from -1deg, #E4E2DC 0 2deg, transparent 2deg 30deg),
+      repeating-conic-gradient(from -.5deg, #80838C 0 1deg, transparent 1deg 6deg), radial-gradient(circle at 35% 30%, #4C4F58, #2A2C33 70%); }
+  .knurl { position:absolute; inset:0; border-radius:50%; transform:translateZ(1.5px); background:repeating-conic-gradient(#D2D3D6 0 1.5deg, #6A6D75 1.5deg 3deg);
+    -webkit-mask:radial-gradient(circle, transparent 0 127px, #000 128px 134px, transparent 135px); }
+  .dial { position:absolute; inset:28px; border-radius:50%; transform:translateZ(2px); background:radial-gradient(circle at 50% 36%, #303339, #0B0C0F 72%); }
+  .dial .ix { position:absolute; inset:9px; border-radius:50%; background:repeating-conic-gradient(from -1.5deg, #F2EEE6 0 3deg, transparent 3deg 30deg);
+    -webkit-mask:radial-gradient(circle, transparent 0 78px, #000 79px 92px, transparent 93px); }
+  .dial i { position:absolute; left:50%; top:50%; background:#F4F1EA; border-radius:2px; transform-origin:50% 100%; }
+  .dial .h { width:7px; height:52px; margin:-52px 0 0 -3.5px; transform:rotate(300deg); } .dial .m { width:4.5px; height:78px; margin:-78px 0 0 -2.25px; transform:rotate(48deg); }
+  .dial .s { width:2px; height:84px; margin:-84px 0 0 -1px; transform:rotate(200deg); background:var(--sand); }
+  .glass { position:absolute; inset:28px; border-radius:50%; transform:translateZ(4px); background:linear-gradient(135deg, rgba(255,255,255,.2), rgba(255,255,255,0) 42%); }
+  .key { position:absolute; width:26px; height:17px; border-radius:7px; background:linear-gradient(180deg, #E2E3E6, #6E7178); }
+  .key.k1 { left:251px; top:62px; transform:translateZ(-7px) rotate(-30deg); } .key.k2 { left:251px; top:192px; transform:translateZ(-7px) rotate(30deg); }
+  .scrim { position:absolute; left:0; width:390px; bottom:0; height:380px; background:linear-gradient(180deg, rgba(10,10,10,0), rgba(10,10,10,.82) 55%, #0A0A0A); }
+  .rail { position:absolute; right:14px; top:330px; z-index:4; display:flex; flex-direction:column; gap:18px; align-items:center; }
+  .rail a { display:flex; flex-direction:column; align-items:center; gap:4px; color:#fff; text-decoration:none; font-size:12.5px; font-weight:600; position:relative; }
+  .rail svg { width:32px; height:32px; fill:none; stroke:#fff; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; filter:drop-shadow(0 2px 6px rgba(0,0,0,.5)); }
+  .rail .badge { position:absolute; right:-6px; top:-4px; min-width:18px; height:18px; border-radius:9px; background:var(--sand); color:var(--void); font-size:11px; font-weight:800; display:grid; place-items:center; }
+  .cap { position:absolute; left:20px; width:290px; bottom:160px; z-index:4; }
+  .cap h1 { font-family:"Antonio", sans-serif; font-size:44px; line-height:46px; font-weight:700; letter-spacing:.01em; }
+  .cap p { margin-top:6px; font-size:15px; line-height:21px; color:var(--soft); }
+  .cap p b { color:#fff; font-weight:600; }
+  .cap a { display:inline-flex; align-items:center; gap:8px; margin-top:12px; padding:10px 16px; border-radius:22px; background:#fff; color:var(--void); font-weight:700; font-size:15px; text-decoration:none; }
+  .peek { position:absolute; left:50%; bottom:83px; width:150px; height:42px; margin-left:-75px; z-index:3; border-radius:75px 75px 0 0;
+    background:radial-gradient(circle at 50% 100%, #F2C230 0 22%, #E09B14 23% 44%, #1A1A1A 45%); opacity:.9; }
+  .peek::after { content:"Next: Active"; position:absolute; left:50%; bottom:6px; transform:translateX(-50%); font-size:11px; color:#fff; white-space:nowrap; text-shadow:0 1px 3px #000; }
+  nav { position:absolute; left:0; width:390px; bottom:0; height:83px; z-index:5; display:flex; justify-content:space-around; padding-top:8px; background:#0A0A0A; border-top:1px solid #1E2026; }
+  nav a { width:80px; display:flex; flex-direction:column; align-items:center; gap:3px; color:#7C828C; font-size:10.5px; font-weight:600; text-decoration:none; }
+  nav a.on { color:#fff; }
+  nav svg { width:26px; height:26px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+</style>
+</head>
+<body>
+  <div class="status"><span>9:41</span><span>Wi-Fi · 87%</span></div>
+  <div class="tabs"><span class="on">My Watch</span><span>Faces</span><span>Discover</span></div>
+  <div class="stage">
+    <div class="w">
+      <div class="strap t"></div><div class="strap b"></div>
+      <div class="edge"></div><div class="edge"></div><div class="edge"></div><div class="edge"></div><div class="edge"></div><div class="edge"></div>
+      <div class="key k1"></div><div class="key k2"></div>
+      <div class="bezel"></div><div class="knurl"></div>
+      <div class="dial"><div class="ix"></div><i class="h"></i><i class="m"></i><i class="s"></i></div>
+      <div class="glass"></div>
+    </div>
+  </div>
+  <div class="scrim"></div>
+  <div class="rail">
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="7.5" cy="7.5" r="4"/><circle cx="16.5" cy="7.5" r="4"/><circle cx="7.5" cy="16.5" r="4"/><circle cx="16.5" cy="16.5" r="4"/></svg>9</a>
+    <a href="#"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>29</a>
+    <a href="#"><svg viewBox="0 0 24 24"><path d="M4 14v4.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V14M12 4v10m-4-4 4 4 4-4"/></svg><span class="badge">2</span>Backup</a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>Discover</a>
+  </div>
+  <div class="cap">
+    <h1>GS HYBRID 7</h1>
+    <p><b>Galaxy Watch 46 mm</b> · connected over Wi-Fi<br>Battery 72% · 1.6 GB free · 2 faces not in a backup</p>
+    <a href="#">Back up now</a>
+  </div>
+  <div class="peek"></div>
+  <nav>
+    <a class="on" href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/><path d="M9 5.8 9.6 2h4.8l.6 3.8M9 18.2l.6 3.8h4.8l.6-3.8M12 9.5V12l1.8 1.2"/></svg>Watch</a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>Search</a>
+    <a href="#"><svg viewBox="0 0 24 24"><path d="M4 14v4.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V14M12 4v10m-4-4 4 4 4-4"/></svg>Backup</a>
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>Settings</a>
+  </nav>
+</body>
+</html>

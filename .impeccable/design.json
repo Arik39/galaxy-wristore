@@ -1,0 +1,396 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-26T22:35:15+00:00",
+  "title": "Design System: Galaxy Wristore",
+  "extensions": {
+    "colorMeta": {
+      "void": {
+        "role": "neutral",
+        "displayName": "Void",
+        "canonical": "oklch(14.0% 0.0022 286.1)",
+        "tonalRamp": [
+          "#0B0B0C",
+          "#252526",
+          "#424243",
+          "#616162",
+          "#828284",
+          "#A5A5A6",
+          "#C9C9CA",
+          "#EEEEF0"
+        ]
+      },
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Graphite",
+        "canonical": "oklch(19.6% 0.0062 271.1)",
+        "tonalRamp": [
+          "#0A0B0E",
+          "#242528",
+          "#414245",
+          "#606165",
+          "#818286",
+          "#A3A5A9",
+          "#C7C9CD",
+          "#EDEEF3"
+        ]
+      },
+      "graphite-high": {
+        "role": "neutral",
+        "displayName": "Graphite High",
+        "canonical": "oklch(23.1% 0.0078 274.6)",
+        "tonalRamp": [
+          "#0A0B0F",
+          "#242529",
+          "#414246",
+          "#606166",
+          "#818287",
+          "#A3A5AA",
+          "#C7C9CE",
+          "#EDEEF4"
+        ]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Instrument Ink",
+        "canonical": "oklch(95.1% 0.0046 258.3)",
+        "tonalRamp": [
+          "#0A0B0D",
+          "#242527",
+          "#404244",
+          "#606164",
+          "#818285",
+          "#A3A5A8",
+          "#C7C9CC",
+          "#EDEFF2"
+        ]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Soft Ink",
+        "canonical": "oklch(74.6% 0.0128 259.8)",
+        "tonalRamp": [
+          "#080B11",
+          "#21252B",
+          "#3E4249",
+          "#5D6169",
+          "#7E838A",
+          "#A0A5AD",
+          "#C4C9D2",
+          "#E9EFF7"
+        ]
+      },
+      "ink-faint": {
+        "role": "neutral",
+        "displayName": "Faint Ink",
+        "canonical": "oklch(59.5% 0.0149 262.4)",
+        "tonalRamp": [
+          "#080B12",
+          "#21252C",
+          "#3E424A",
+          "#5D616A",
+          "#7D838C",
+          "#A0A5AF",
+          "#C4C9D3",
+          "#E9EFF9"
+        ]
+      },
+      "alert": {
+        "role": "secondary",
+        "displayName": "Reset Red",
+        "canonical": "oklch(63.6% 0.1770 25.9)",
+        "tonalRamp": [
+          "#3A0000",
+          "#610000",
+          "#880000",
+          "#B02225",
+          "#D84C47",
+          "#FF7168",
+          "#FF968B",
+          "#FFBCAF"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "rgba(237,239,242,0.18)",
+        "tonalRamp": []
+      },
+      "line-faint": {
+        "role": "neutral",
+        "displayName": "Faint Hairline",
+        "canonical": "rgba(237,239,242,0.08)",
+        "tonalRamp": []
+      }
+    },
+    "typographyMeta": {
+      "large-title": {
+        "displayName": "Large Title",
+        "purpose": "A section's title top left and a pushed page's collapsing title; scales with text size up to 1.5x."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Sheet titles and empty-state headings."
+      },
+      "name": {
+        "displayName": "Name",
+        "purpose": "A face's or app's name; at 16 px the small centred bar title."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Readouts: battery, counts, sizes. Tabular digits."
+      },
+      "figure-small": {
+        "displayName": "Figure Small",
+        "purpose": "Job percentages."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Values, list titles and explanations in the platform face."
+      },
+      "body-strong": {
+        "displayName": "Body Strong",
+        "purpose": "Emphasis within body text."
+      },
+      "secondary": {
+        "displayName": "Secondary",
+        "purpose": "Subtitles in soft ink."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Metadata lines in soft ink."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "11 px tracked capitals for field labels, section headers and status; the smallest size used."
+      },
+      "button": {
+        "displayName": "Button",
+        "purpose": "Tracked capital labels on buttons and segments."
+      }
+    },
+    "shadows": [
+      {
+        "name": "disc-shadow",
+        "value": "0 18px 40px rgba(0,0,0,0.6)",
+        "purpose": "Under the FaceDisc's round display only; nothing else casts a shadow."
+      },
+      {
+        "name": "disc-pool",
+        "value": "radial-gradient(ellipse, rgba(237,239,242,0.12), rgba(237,239,242,0))",
+        "purpose": "A faint pool of light beneath the disc, 80% of its width."
+      },
+      {
+        "name": "disc-glass",
+        "value": "linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0) 60%)",
+        "purpose": "Glass sheen over the disc's display."
+      },
+      {
+        "name": "bar-scrim",
+        "value": "rgba(9,9,10,0.95)",
+        "purpose": "A title bar turns solid with a faint hairline once content scrolls beneath."
+      },
+      {
+        "name": "backdrop-dot-grid",
+        "value": "radial-gradient(circle, rgba(255,255,255,0.06) 0.9px, transparent 1px) 0 0 / 16px 16px, #09090A",
+        "purpose": "The Backdrop behind every screen."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Exponential ease-out for every transition, starting from a visible state and interruptible."
+      },
+      {
+        "name": "ease-in-out",
+        "value": "cubic-bezier(0.65, 0, 0.35, 1)",
+        "purpose": "Defined in tokens; reserved for symmetric moves."
+      },
+      {
+        "name": "short",
+        "value": "280ms",
+        "purpose": "Swaps, readout changes, bar fades, page snaps, picture rings."
+      },
+      {
+        "name": "medium",
+        "value": "420ms",
+        "purpose": "The bezel completion turn, dimming, the picture viewer opening."
+      },
+      {
+        "name": "pulse-loop",
+        "value": "1400ms",
+        "purpose": "Status dot halo while a job runs; stops under Reduce Motion."
+      },
+      {
+        "name": "trail-loop",
+        "value": "1600ms",
+        "purpose": "Nine-tick trail for an unknown amount; becomes every fifth tick lit, still, under Reduce Motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "content-max",
+        "value": "720px",
+        "purpose": "Content is capped and centred beyond this width (tablets, landscape)."
+      },
+      {
+        "name": "title-scale-cap",
+        "value": "1.5x",
+        "purpose": "Titles and bar controls follow text size up to 1.5x, then hold."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The screen's one filled action.",
+      "html": "<button class=\"ds-btn-primary\">BACK UP NOW</button>",
+      "css": ".ds-btn-primary{background:#EDEFF2;color:#09090A;border:none;border-radius:3px;min-height:46px;padding:14px 20px;font:700 12px/16px system-ui,-apple-system,Roboto,sans-serif;letter-spacing:2.4px;text-transform:uppercase;width:320px;cursor:pointer;transition:background 280ms cubic-bezier(0.16,1,0.3,1)}.ds-btn-primary:hover{background:rgba(237,239,242,0.92)}.ds-btn-primary:active{background:rgba(237,239,242,0.85)}.ds-btn-primary:focus-visible{outline:1px solid #EDEFF2;outline-offset:3px}"
+    },
+    {
+      "name": "Outlined Button",
+      "kind": "button",
+      "refersTo": "button-outlined",
+      "description": "Every action that is not the primary.",
+      "html": "<button class=\"ds-btn-outlined\">ADD A FILE</button>",
+      "css": ".ds-btn-outlined{background:transparent;color:#EDEFF2;border:1px solid rgba(237,239,242,0.45);border-radius:3px;min-height:46px;padding:14px 20px;font:700 12px/16px system-ui,-apple-system,Roboto,sans-serif;letter-spacing:2.4px;text-transform:uppercase;width:320px;cursor:pointer;transition:background 280ms cubic-bezier(0.16,1,0.3,1)}.ds-btn-outlined:hover,.ds-btn-outlined:active{background:rgba(237,239,242,0.08)}.ds-btn-outlined:focus-visible{outline:1px solid #EDEFF2;outline-offset:3px}"
+    },
+    {
+      "name": "Destructive Button",
+      "kind": "button",
+      "refersTo": "button-destructive",
+      "description": "Remove or delete: outlined in red.",
+      "html": "<button class=\"ds-btn-danger\">REMOVE FROM WATCH</button>",
+      "css": ".ds-btn-danger{background:transparent;color:#E2554F;border:1px solid rgba(226,85,79,0.45);border-radius:3px;min-height:46px;padding:14px 20px;font:700 12px/16px system-ui,-apple-system,Roboto,sans-serif;letter-spacing:2.4px;text-transform:uppercase;width:320px;cursor:pointer}.ds-btn-danger:hover,.ds-btn-danger:active{background:rgba(226,85,79,0.08)}.ds-btn-danger:focus-visible{outline:1px solid #E2554F;outline-offset:3px}"
+    },
+    {
+      "name": "Segmented Choice",
+      "kind": "chip",
+      "refersTo": "segment-selected",
+      "description": "Selected segment is lit graphite, never white.",
+      "html": "<div class=\"ds-seg\"><button class=\"ds-seg-on\">FACES</button><button>APPS</button></div>",
+      "css": ".ds-seg{display:flex;width:320px;border:1px solid rgba(237,239,242,0.18);border-radius:3px;overflow:hidden;background:#09090A}.ds-seg button{flex:1;background:transparent;color:#A8ADB5;border:none;padding:14px 8px;font:700 12px/16px system-ui,-apple-system,Roboto,sans-serif;letter-spacing:2.4px;cursor:pointer}.ds-seg button+button{border-left:1px solid rgba(237,239,242,0.18)}.ds-seg .ds-seg-on{background:#1C1D21;color:#EDEFF2}.ds-seg button:hover{color:#EDEFF2}.ds-seg button:focus-visible{outline:1px solid #EDEFF2;outline-offset:-2px}"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Graphite fill, hairline edge, ink border on focus.",
+      "html": "<label class=\"ds-field\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#A8ADB5\" stroke-width=\"1.7\" stroke-linecap=\"round\"><circle cx=\"11\" cy=\"11\" r=\"6.5\"/><path d=\"M16 16l4.5 4.5\"/></svg><input placeholder=\"Search Tizen Archive\"></label>",
+      "css": ".ds-field{display:flex;align-items:center;gap:12px;width:320px;padding:12px 14px;background:#141518;border:1px solid rgba(237,239,242,0.18);border-radius:3px}.ds-field:focus-within{border-color:#EDEFF2}.ds-field input{flex:1;background:transparent;border:none;outline:none;color:#EDEFF2;font:400 16px/22px system-ui,-apple-system,Roboto,sans-serif}.ds-field input::placeholder{color:#7A7F88}"
+    },
+    {
+      "name": "Spec Row",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Tracked label left, value flush right, hairline under; red value only at risk.",
+      "html": "<div class=\"ds-spec\"><div class=\"ds-row\"><span>VERSION</span><b>1.0.1</b></div><div class=\"ds-row\"><span>BACKUP</span><b class=\"ds-risk\">Not backed up</b></div></div>",
+      "css": ".ds-spec{width:340px;background:#09090A;padding:0 4px}.ds-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid rgba(237,239,242,0.18)}.ds-row span{font:600 11px/15px system-ui,-apple-system,Roboto,sans-serif;letter-spacing:2.2px;color:#7A7F88}.ds-row b{font:400 16px/22px system-ui,-apple-system,Roboto,sans-serif;color:#EDEFF2}.ds-row b.ds-risk{color:#E2554F}"
+    },
+    {
+      "name": "Readouts",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Tabular Archivo figures over faint tracked labels, split by hairlines.",
+      "html": "<div class=\"ds-readouts\"><div><b>72%</b><span>BATTERY</span></div><div><b class=\"ds-risk\">11/14</b><span>BACKED UP</span></div></div>",
+      "css": ".ds-readouts{display:flex;width:340px;border-top:1px solid rgba(237,239,242,0.18);padding-top:16px;background:#09090A}.ds-readouts div{flex:1;display:flex;flex-direction:column;gap:4px;padding-left:16px}.ds-readouts div+div{border-left:1px solid rgba(237,239,242,0.18)}.ds-readouts div:first-child{padding-left:0}.ds-readouts b{font:350 26px/30px Archivo,sans-serif;font-variation-settings:'wdth' 112,'wght' 350;font-variant-numeric:tabular-nums;color:#EDEFF2}.ds-readouts b.ds-risk{color:#E2554F}.ds-readouts span{font:600 11px/15px system-ui,-apple-system,Roboto,sans-serif;letter-spacing:2.2px;color:#7A7F88}"
+    },
+    {
+      "name": "Tab Bar",
+      "kind": "nav",
+      "refersTo": "tab-bar",
+      "description": "Icons only; the open tab in ink with a dot beneath.",
+      "html": "<nav class=\"ds-tabs\"><a class=\"ds-on\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"7\" y=\"6\" width=\"10\" height=\"12\" rx=\"5\"/><path d=\"M9 6l1-3h4l1 3M9 18l1 3h4l1-3M12 10v2l1.5 1\"/></svg><i></i></a><a><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"4\" y=\"4\" width=\"6.5\" height=\"6.5\" rx=\"1.5\"/><rect x=\"13.5\" y=\"4\" width=\"6.5\" height=\"6.5\" rx=\"1.5\"/><rect x=\"4\" y=\"13.5\" width=\"6.5\" height=\"6.5\" rx=\"1.5\"/><rect x=\"13.5\" y=\"13.5\" width=\"6.5\" height=\"6.5\" rx=\"1.5\"/></svg></a><a><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"8.5\"/><path d=\"M15.5 8.5l-2 5-5 2 2-5z\"/></svg></a><a><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 4v11M7.5 10.5L12 15l4.5-4.5M5 15v4h14v-4\"/></svg></a></nav>",
+      "css": ".ds-tabs{display:flex;justify-content:space-around;width:360px;height:56px;align-items:center;background:#09090A;border-top:1px solid rgba(237,239,242,0.08)}.ds-tabs a{display:flex;flex-direction:column;align-items:center;gap:5px;color:#7A7F88;cursor:pointer}.ds-tabs a:hover{color:#A8ADB5}.ds-tabs a.ds-on{color:#EDEFF2}.ds-tabs i{width:4px;height:4px;border-radius:50%;background:#EDEFF2}"
+    },
+    {
+      "name": "FaceDisc Bezel",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "The signature: a face inside a hairline 60-tick bezel, ticks lit from twelve as progress.",
+      "html": "<div class=\"ds-disc\"><svg viewBox=\"0 0 200 200\" width=\"240\" height=\"240\"><circle cx=\"100\" cy=\"100\" r=\"99.5\" fill=\"none\" stroke=\"rgba(237,239,242,0.18)\"/><circle cx=\"100\" cy=\"100\" r=\"90.5\" fill=\"none\" stroke=\"rgba(237,239,242,0.08)\"/><line x1=\"100.00\" y1=\"7.50\" x2=\"100.00\" y2=\"2.50\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"109.88\" y1=\"6.02\" x2=\"110.19\" y2=\"3.03\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"119.65\" y1=\"7.57\" x2=\"120.27\" y2=\"4.63\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"129.20\" y1=\"10.13\" x2=\"130.13\" y2=\"7.27\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"138.44\" y1=\"13.67\" x2=\"139.66\" y2=\"10.93\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"146.25\" y1=\"19.89\" x2=\"148.75\" y2=\"15.56\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"155.55\" y1=\"23.55\" x2=\"157.31\" y2=\"21.12\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"163.23\" y1=\"29.77\" x2=\"165.24\" y2=\"27.54\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"170.23\" y1=\"36.77\" x2=\"172.46\" y2=\"34.76\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"176.45\" y1=\"44.45\" x2=\"178.88\" y2=\"42.69\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"180.11\" y1=\"53.75\" x2=\"184.44\" y2=\"51.25\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"186.33\" y1=\"61.56\" x2=\"189.07\" y2=\"60.34\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"189.87\" y1=\"70.80\" x2=\"192.73\" y2=\"69.87\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"192.43\" y1=\"80.35\" x2=\"195.37\" y2=\"79.73\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"193.98\" y1=\"90.12\" x2=\"196.97\" y2=\"89.81\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"192.50\" y1=\"100.00\" x2=\"197.50\" y2=\"100.00\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"193.98\" y1=\"109.88\" x2=\"196.97\" y2=\"110.19\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"192.43\" y1=\"119.65\" x2=\"195.37\" y2=\"120.27\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"189.87\" y1=\"129.20\" x2=\"192.73\" y2=\"130.13\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"186.33\" y1=\"138.44\" x2=\"189.07\" y2=\"139.66\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"180.11\" y1=\"146.25\" x2=\"184.44\" y2=\"148.75\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"176.45\" y1=\"155.55\" x2=\"178.88\" y2=\"157.31\" stroke=\"#EDEFF2\" stroke-opacity=\"1\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><line x1=\"170.23\" y1=\"163.23\" x2=\"172.46\" y2=\"165.24\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"163.23\" y1=\"170.23\" x2=\"165.24\" y2=\"172.46\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"155.55\" y1=\"176.45\" x2=\"157.31\" y2=\"178.88\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"146.25\" y1=\"180.11\" x2=\"148.75\" y2=\"184.44\" stroke=\"#EDEFF2\" stroke-opacity=\"0.62\" stroke-width=\"1.6\" stroke-linecap=\"round\"/><line x1=\"138.44\" y1=\"186.33\" x2=\"139.66\" y2=\"189.07\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"129.20\" y1=\"189.87\" x2=\"130.13\" y2=\"192.73\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"119.65\" y1=\"192.43\" x2=\"120.27\" y2=\"195.37\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"109.88\" y1=\"193.98\" x2=\"110.19\" y2=\"196.97\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"100.00\" y1=\"192.50\" x2=\"100.00\" y2=\"197.50\" stroke=\"#EDEFF2\" stroke-opacity=\"0.62\" stroke-width=\"1.6\" stroke-linecap=\"round\"/><line x1=\"90.12\" y1=\"193.98\" x2=\"89.81\" y2=\"196.97\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"80.35\" y1=\"192.43\" x2=\"79.73\" y2=\"195.37\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"70.80\" y1=\"189.87\" x2=\"69.87\" y2=\"192.73\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"61.56\" y1=\"186.33\" x2=\"60.34\" y2=\"189.07\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"53.75\" y1=\"180.11\" x2=\"51.25\" y2=\"184.44\" stroke=\"#EDEFF2\" stroke-opacity=\"0.62\" stroke-width=\"1.6\" stroke-linecap=\"round\"/><line x1=\"44.45\" y1=\"176.45\" x2=\"42.69\" y2=\"178.88\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"36.77\" y1=\"170.23\" x2=\"34.76\" y2=\"172.46\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"29.77\" y1=\"163.23\" x2=\"27.54\" y2=\"165.24\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"23.55\" y1=\"155.55\" x2=\"21.12\" y2=\"157.31\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"19.89\" y1=\"146.25\" x2=\"15.56\" y2=\"148.75\" stroke=\"#EDEFF2\" stroke-opacity=\"0.62\" stroke-width=\"1.6\" stroke-linecap=\"round\"/><line x1=\"13.67\" y1=\"138.44\" x2=\"10.93\" y2=\"139.66\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"10.13\" y1=\"129.20\" x2=\"7.27\" y2=\"130.13\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"7.57\" y1=\"119.65\" x2=\"4.63\" y2=\"120.27\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"6.02\" y1=\"109.88\" x2=\"3.03\" y2=\"110.19\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"7.50\" y1=\"100.00\" x2=\"2.50\" y2=\"100.00\" stroke=\"#EDEFF2\" stroke-opacity=\"0.62\" stroke-width=\"1.6\" stroke-linecap=\"round\"/><line x1=\"6.02\" y1=\"90.12\" x2=\"3.03\" y2=\"89.81\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"7.57\" y1=\"80.35\" x2=\"4.63\" y2=\"79.73\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"10.13\" y1=\"70.80\" x2=\"7.27\" y2=\"69.87\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"13.67\" y1=\"61.56\" x2=\"10.93\" y2=\"60.34\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"19.89\" y1=\"53.75\" x2=\"15.56\" y2=\"51.25\" stroke=\"#EDEFF2\" stroke-opacity=\"0.62\" stroke-width=\"1.6\" stroke-linecap=\"round\"/><line x1=\"23.55\" y1=\"44.45\" x2=\"21.12\" y2=\"42.69\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"29.77\" y1=\"36.77\" x2=\"27.54\" y2=\"34.76\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"36.77\" y1=\"29.77\" x2=\"34.76\" y2=\"27.54\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"44.45\" y1=\"23.55\" x2=\"42.69\" y2=\"21.12\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"53.75\" y1=\"19.89\" x2=\"51.25\" y2=\"15.56\" stroke=\"#EDEFF2\" stroke-opacity=\"0.62\" stroke-width=\"1.6\" stroke-linecap=\"round\"/><line x1=\"61.56\" y1=\"13.67\" x2=\"60.34\" y2=\"10.93\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"70.80\" y1=\"10.13\" x2=\"69.87\" y2=\"7.27\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"80.35\" y1=\"7.57\" x2=\"79.73\" y2=\"4.63\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><line x1=\"90.12\" y1=\"6.02\" x2=\"89.81\" y2=\"3.03\" stroke=\"#EDEFF2\" stroke-opacity=\"0.26\" stroke-width=\"1\" stroke-linecap=\"round\"/><path d=\"M97 0.5h6l-3 5z\" fill=\"#EDEFF2\"/></svg><div class=\"ds-face\"></div></div>",
+      "css": ".ds-disc{position:relative;width:240px;height:240px;background:#09090A}.ds-face{position:absolute;inset:26px;border-radius:50%;background:radial-gradient(circle at 50% 40%,#2A2C33,#0B0B0D 70%);box-shadow:0 18px 40px rgba(0,0,0,0.6)}.ds-face::after{content:'';position:absolute;inset:0;border-radius:50%;background:linear-gradient(135deg,rgba(255,255,255,0.10),rgba(255,255,255,0) 60%)}"
+    },
+    {
+      "name": "DEMO Badge",
+      "kind": "chip",
+      "refersTo": "demo-badge",
+      "description": "Marks demo data, always.",
+      "html": "<span class=\"ds-demo\">DEMO</span>",
+      "css": ".ds-demo{display:inline-block;padding:3px 8px;border:1px solid rgba(237,239,242,0.18);border-radius:3px;font:600 11px/15px system-ui,-apple-system,Roboto,sans-serif;letter-spacing:2.2px;color:#7A7F88;background:#09090A}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Face Is the Screen",
+    "overview": "**Creative North Star: \"The Face Is the Screen\"**\n\nThe watch's own face leads. One real face picture, big and round inside a hairline bezel of 60 ticks, sits on near-black, and everything else stays quiet beneath it. The world is an instrument: a dark field with a faint dot grid, hairline rules, one ink white, and one red that appears only where something would be lost. It is futuretech and minimal, and it never glows.\n\nDensity is low and text is sparse. A screen carries a wide, light Archivo title top left, a few tracked capital labels, figures set like readouts, and one white button. The platform's own face carries body text, so the app reads native on iPhone and on Android while the titles, names and figures carry the identity. The coloured element on any screen is usually the user's own watch face. The interface itself has no colour beyond ink, greys and the risk red.\n\nRejected and not part of this world: a violet palette, glow or neon, and a 3D watch model or product render above a settings list.",
+    "keyCharacteristics": [
+      "Near-black field (void) under a 16 px dot grid of 6% white dots.",
+      "One ink white for text, live state and progress; greys for quieter text; no second accent.",
+      "Red only for what a reset would lose and for refusals.",
+      "Hairlines at 18% ink; nearly square corners (3 px controls, 6 px containers).",
+      "Archivo, wide and light, for titles, names and figures; tracked 11 px capitals for labels.",
+      "The bezel: 60 ticks that turn, light up as progress, and spin once when a job is done.",
+      "Exponential ease-out from 280 to 420 ms, and Reduce Motion honoured everywhere."
+    ],
+    "rules": [
+      {
+        "name": "The One Ink Rule",
+        "body": "Text, icons, live state and progress are all ink or its greys. There is no brand accent, no glow and no neon; the colour on screen belongs to the user's watch faces.",
+        "section": "colors"
+      },
+      {
+        "name": "The Red Means Loss Rule",
+        "body": "Red marks only what a reset would destroy and things the app or watch refuses. Never use it for emphasis, decoration, branding or a generic error tint.",
+        "section": "colors"
+      },
+      {
+        "name": "The 18 Percent Rule",
+        "body": "A hairline is ink at 18%. The 8% faint hairline is reserved for scroll-under bar borders, the bezel's inner ring and secondary picture rings; it is not a quieter divider.",
+        "section": "colors"
+      },
+      {
+        "name": "The Engraved Title Rule",
+        "body": "Titles, names and figures use Archivo wide and light. Never use a tall condensed or bold display style.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tracked Capitals Rule",
+        "body": "Labels and buttons are small tracked capitals; running text stays in sentence case in the platform face.",
+        "section": "typography"
+      },
+      {
+        "name": "The Text Size Rule",
+        "body": "Every style follows the user's text size. Titles and bar controls are capped at 1.5x, and labels may wrap to two lines rather than clip.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Interface Rule",
+        "body": "Controls, rows, sheets and menus never cast shadows; they are separated by tone and an 18% hairline. Depth belongs to the watch face alone.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** set every screen on void with the 16 px dot grid, and let the user's face pictures be the colour.",
+      "**Do** give a screen exactly one filled ink button; make every other action outlined, and destructive actions outlined in red.",
+      "**Do** use red only for what a reset would lose and for refusals.",
+      "**Do** draw hairlines at 18% ink; keep 8% for scroll-under bar borders, the bezel's inner ring and secondary picture rings.",
+      "**Do** set titles, names and figures in Archivo wide and light, figures with tabular digits, and labels in 11 px tracked capitals.",
+      "**Do** show progress as lit bezel ticks, either on the FaceDisc or as a Tick Bar.",
+      "**Do** label demo data with the DEMO badge.",
+      "**Do** animate with the exponential ease-out over 280 to 420 ms and give every motion a Reduce Motion path.",
+      "**Do** cap content at 720 dp on tablets and let titles grow with text size up to 1.5x."
+    ],
+    "donts": [
+      "**Don't** introduce a second accent colour, a violet palette, glow or neon.",
+      "**Don't** put a 3D watch model or product render where the user's real face picture belongs.",
+      "**Don't** fill a selected segment, chip or tab with white; white belongs to the one primary button.",
+      "**Don't** cast shadows from controls, rows or sheets; only the FaceDisc has depth.",
+      "**Don't** round corners beyond 3 px on controls or 6 px on containers.",
+      "**Don't** use a tall condensed or bold display style for titles.",
+      "**Don't** set any text below 11 px or any text colour quieter than faint ink.",
+      "**Don't** use icon fonts or emoji glyphs; draw icons as 1.7-stroke line paths on the 24 grid."
+    ]
+  }
+}
