@@ -14,6 +14,7 @@ import '../features/discover/discover_screen.dart';
 import '../features/discover/package_page.dart';
 import '../features/faces/faces_screen.dart';
 import '../features/home/home_screen.dart';
+import '../features/watch/watch_settings_page.dart';
 import 'theme.dart';
 import 'watch_controller.dart';
 
@@ -85,8 +86,8 @@ class _ShellState extends State<Shell> {
   /// The tab to open on, for screenshots of each section (`--dart-define=WRISTORE_TAB=faces`); the Watch tab otherwise.
   static const _initialTab = String.fromEnvironment('WRISTORE_TAB');
 
-  /// A page to open on start, also for screenshots (`--dart-define=WRISTORE_OPEN=face`): `face`, `app`, `package` or
-  /// `restore`, opened once the watch's state allows it.
+  /// A page to open on start, also for screenshots (`--dart-define=WRISTORE_OPEN=face`): `face`, `app`, `package`,
+  /// `restore` or `settings`, opened once the watch's state allows it.
   static const _initialPage = String.fromEnvironment('WRISTORE_OPEN');
 
   Section _section = Section.values.firstWhere((s) => s.name == _initialTab, orElse: () => Section.watch);
@@ -122,6 +123,8 @@ class _ShellState extends State<Shell> {
         );
       case 'restore' when c.backups.isNotEmpty:
         page = RestorePage(record: c.backups.first);
+      case 'settings' when c.phase == LinkPhase.connected:
+        page = const WatchSettingsPage();
       case 'package':
         c.removeListener(_openInitialPage);
         final found = await c.services.catalog.search(kind: CatalogKind.watchFace);

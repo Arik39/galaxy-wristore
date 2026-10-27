@@ -15,6 +15,7 @@ import '../../design/type.dart';
 import '../../design/widgets.dart';
 import '../common/installed_page.dart';
 import '../setup/connect_sheets.dart';
+import '../watch/watch_settings_page.dart';
 
 /// My Watch: the face on the wrist, big, inside the bezel; swipe the bezel round through the other faces. Below it, how
 /// safe the watch is and the one thing to do next.
@@ -78,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
         semanticHint: face == null ? null : 'Opens this face',
       ),
     );
-    final rail = _Rail(controller: c, face: face, atRisk: unsaved.isNotEmpty);
+    final rail = _Rail(controller: c, atRisk: unsaved.isNotEmpty);
     final name = _Name(controller: c, face: face, atRisk: face != null && unsaved.contains(face.id));
     final state = _State(controller: c);
 
@@ -243,10 +244,9 @@ class _Header extends StatelessWidget {
 
 /// The rail: details of the face shown, the backup, and Discover.
 class _Rail extends StatelessWidget {
-  const _Rail({required this.controller, required this.face, required this.atRisk});
+  const _Rail({required this.controller, required this.atRisk});
 
   final WatchController controller;
-  final WatchPackage? face;
   final bool atRisk;
 
   @override
@@ -263,16 +263,22 @@ class _Rail extends StatelessWidget {
         ],
       ),
     );
+    final c = controller;
+    final ready = c.phase == LinkPhase.connected && c.operation == null;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Find my watch: one tap rings it, the next stops it.
         button(
-          AppIcon.info,
-          'About this face',
-          face == null
-              ? null
-              : () =>
-                    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => InstalledPage(package: face!))),
+          c.ringing ? AppIcon.close : AppIcon.ring,
+          c.ringing ? 'Stop ringing' : 'Ring my watch',
+          c.ringing ? c.stopRinging : (ready ? c.ring : null),
+        ),
+        const SizedBox(height: Space.s),
+        button(
+          AppIcon.settings,
+          'Watch settings',
+          () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const WatchSettingsPage())),
         ),
         const SizedBox(height: Space.s),
         button(
@@ -281,8 +287,6 @@ class _Rail extends StatelessWidget {
           () => SectionScope.goTo(context, Section.backup),
           dot: atRisk,
         ),
-        const SizedBox(height: Space.s),
-        button(AppIcon.discover, 'Discover faces', () => SectionScope.goTo(context, Section.discover)),
       ],
     );
   }
@@ -365,6 +369,7 @@ class _State extends StatelessWidget {
       return Column(
         key: const ValueKey('approve'),
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Divider(),
           const SizedBox(height: Space.l),
@@ -380,19 +385,30 @@ class _State extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: Space.m),
+          Text(
+            'No question on the watch? Wake it and send the request again. If you just turned on Debugging, '
+            'restart the watch first.',
+            style: AppType.caption.copyWith(color: Palette.inkFaint),
+          ),
+          const SizedBox(height: Space.l),
+          // A new connection offers this phone's key again, which makes the watch show its question again.
+          AppButton(label: 'Send the request again', filled: false, expand: true, onPressed: c.askAgain),
         ],
       );
     }
     final risk = c.notBackedUp;
+    // What Tizen Archive does not have stays at risk, but backing up again would not save it: no button for it.
+    final saveable = c.toBackUp;
     final backup = c.latestBackup;
     final battery = c.status?.batteryPercent;
     final total = c.downloaded.length;
     final (String action, VoidCallback? onAction) = switch (c.problem) {
       final String _ => ('Try again', c.operation == null ? c.refresh : null),
-      _ when backup == null || risk.isNotEmpty => (
-        risk.isEmpty || backup == null
+      _ when backup == null || saveable.isNotEmpty => (
+        saveable.isEmpty || backup == null
             ? 'Back up my watch'
-            : 'Back up ${count(risk.length, 'face or app', 'faces and apps')}',
+            : 'Back up ${count(saveable.length, 'face or app', 'faces and apps')}',
         c.phase == LinkPhase.connected && c.operation == null ? c.backUp : null,
       ),
       _ => ('Discover faces', () => SectionScope.goTo(context, Section.discover)),
@@ -424,7 +440,16 @@ class _State extends StatelessWidget {
         ),
         if (c.problem != null) ...[const SizedBox(height: Space.l), Text(c.problem!, style: AppType.secondary)],
         const SizedBox(height: Space.xl),
-        AppButton(label: action, onPressed: onAction, expand: true),
+        // While a backup runs, the one button stops it.
+        if (c.job == Job.backingUp)
+          AppButton(
+            label: c.stopping ? 'Stopping' : 'Stop backup',
+            filled: false,
+            expand: true,
+            onPressed: c.stopping ? null : c.stopBackUp,
+          )
+        else
+          AppButton(label: action, onPressed: onAction, expand: true),
       ],
     );
   }

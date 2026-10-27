@@ -16,8 +16,11 @@ class _FailingConnector implements WatchConnector {
   final WatchError error;
 
   @override
-  Future<WatchConnection> connect(WatchAddress address, {void Function()? onApprovalNeeded}) async =>
-      throw WatchException(error, 'test');
+  Future<WatchConnection> connect(
+    WatchAddress address, {
+    void Function()? onApprovalNeeded,
+    Future<void>? giveUp,
+  }) async => throw WatchException(error, 'test');
 }
 
 void main() {
@@ -109,5 +112,75 @@ void main() {
       c.services.catalog.details('com.watchface.MessaRT18'),
       throwsA(isA<CatalogException>().having((e) => e.statusCode, 'statusCode', 404)),
     );
+  });
+
+  test('ringing the watch plays its find tone until it is stopped, and opening one of its screens works', () async {
+    final c = WatchController(demoServices(), await SharedPreferences.getInstance());
+    await c.start();
+    expect(c.currentFaceId, 'com.watchface.GSHybrid7');
+
+    final ringing = c.ring();
+    await Future<void>.delayed(const Duration(milliseconds: 1200));
+    expect(c.ringing, isTrue);
+    expect(c.operation?.label, 'Ringing your watch');
+    c.stopRinging();
+    await ringing;
+    expect(c.ringing, isFalse);
+    expect(c.operation, isNull);
+    expect(c.problem, isNull);
+
+    expect(await c.openOnWatch('com.samsung.clocksetting.sound'), isNull);
+    expect(await c.openOnWatch('rm -rf /'), isNotNull);
+  });
+
+  test('asking again drops the connection waiting for approval and makes the watch ask again', () async {
+    final c = WatchController(demoServices(), await SharedPreferences.getInstance());
+    final connecting = c.setAddress(WatchAddress.parse('192.168.2.66')!);
+    while (c.phase != LinkPhase.waitingForApproval) {
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+    }
+    expect(c.askedTimes, 1);
+    c.askAgain();
+    while (c.askedTimes < 2) {
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+    }
+    expect(c.phase, LinkPhase.waitingForApproval);
+    await connecting;
+    expect(c.phase, LinkPhase.connected);
+    expect(c.problem, isNull);
+  });
+
+  test('a backup saves what Tizen Archive has, and what it does not have is not offered again', () async {
+    final c = WatchController(demoServices(), await SharedPreferences.getInstance());
+    await c.start();
+    expect([for (final p in c.toBackUp) p.name], ['GS Hybrid 7', 'GS Hybrid 6', 'MD210']);
+    expect(c.unsaveable, isEmpty);
+
+    await c.backUp();
+    expect(c.latestBackup!.idsUnsaveable, {'com.watchface.MD210'});
+    expect([for (final p in c.notBackedUp) p.name], ['MD210']);
+    expect([for (final p in c.unsaveable) p.name], ['MD210']);
+    expect(c.toBackUp, isEmpty);
+    expect(c.backedUpCount, 13);
+  });
+
+  test('a backup stopped halfway keeps nothing and leaves the watch connected', () async {
+    final c = WatchController(demoServices(), await SharedPreferences.getInstance());
+    await c.start();
+    final before = c.backups.length;
+
+    final running = c.backUp();
+    while (c.job != Job.backingUp || (c.operation?.progress ?? -1) <= 0) {
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    }
+    c.stopBackUp();
+    expect(c.stopping, isTrue);
+    expect(await running, isNull);
+    expect(c.wasStopped, isTrue);
+    expect(c.problem, isNull);
+    expect(c.backups, hasLength(before));
+    expect(c.job, isNull);
+    expect(c.stopping, isFalse);
+    expect(c.phase, LinkPhase.connected);
   });
 }

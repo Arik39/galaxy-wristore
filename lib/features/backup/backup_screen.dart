@@ -66,10 +66,12 @@ class BackupScreen extends StatelessWidget {
             Text('What a backup holds', style: AppType.title),
             const SizedBox(height: Space.m),
             Text(
-              'Copies of the faces and apps you added, from Tizen Archive or your own files; the music and pictures on '
-              'the watch; and a fingerprint of every app.',
+              'Copies of the faces and apps you added that Tizen Archive has; the music and pictures on the watch; and a '
+              'fingerprint of every app.',
               style: AppType.body,
             ),
+            const SizedBox(height: Space.m),
+            Text(Disclaimer.text, style: AppType.body.copyWith(color: Palette.inkSoft)),
             const SizedBox(height: Space.m),
             Text(_limits, style: AppType.body.copyWith(color: Palette.inkSoft)),
           ],
@@ -110,6 +112,8 @@ class _Now extends StatelessWidget {
     final c = controller;
     final latest = c.latestBackup;
     final unsaved = c.notBackedUp;
+    final notYet = c.toBackUp;
+    final never = c.unsaveable;
     final running = c.job == Job.backingUp ? c.operation : null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -118,8 +122,7 @@ class _Now extends StatelessWidget {
           Text('No backup yet', style: AppType.title),
           const SizedBox(height: Space.s),
           Text(
-            'A backup keeps the faces and apps you added, and the music and pictures on the watch. It cannot hold the data '
-            "inside apps or the watch's settings.",
+            'A backup keeps copies of the faces and apps you added, and the music and pictures on the watch.',
             style: AppType.secondary,
           ),
         ] else ...[
@@ -130,20 +133,15 @@ class _Now extends StatelessWidget {
             risk: unsaved.isNotEmpty,
           ),
           SpecRow('Files', '${latest.mediaCount}'),
-          if (unsaved.isNotEmpty) ...[
+          if (notYet.isNotEmpty) ...[
             const SizedBox(height: Space.l),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(padding: EdgeInsets.only(top: 5), child: RiskDot()),
-                const SizedBox(width: Space.s),
-                Expanded(
-                  child: Text(
-                    'Not in it yet: ${listNames([for (final p in unsaved) p.name], max: 3)}',
-                    style: AppType.secondary.copyWith(color: Palette.ink),
-                  ),
-                ),
-              ],
+            _RiskLine('Not in it yet: ${listNames([for (final p in notYet) p.name], max: 3)}'),
+          ],
+          if (never.isNotEmpty) ...[
+            const SizedBox(height: Space.m),
+            _RiskLine(
+              'Tizen Archive does not have ${listNames([for (final p in never) p.name], max: 3)}, so no backup can '
+              'save ${never.length == 1 ? 'it' : 'them'}.',
             ),
           ],
         ],
@@ -151,7 +149,20 @@ class _Now extends StatelessWidget {
         AnimatedSwitcher(
           duration: Motion.short,
           child: running != null
-              ? JobProgress(key: const ValueKey('running'), label: running.label, progress: running.progress)
+              ? Column(
+                  key: const ValueKey('running'),
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    JobProgress(label: running.label, progress: running.progress),
+                    const SizedBox(height: Space.m),
+                    AppButton(
+                      label: c.stopping ? 'Stopping' : 'Stop',
+                      filled: false,
+                      expand: true,
+                      onPressed: c.stopping ? null : c.stopBackUp,
+                    ),
+                  ],
+                )
               : AppButton(
                   key: const ValueKey('button'),
                   label: 'Back up now',
@@ -168,6 +179,8 @@ class _Now extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
+        const SizedBox(height: Space.l),
+        const Disclaimer(),
       ],
     );
   }
@@ -178,10 +191,63 @@ class _Now extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          file == null
-              ? (controller.problem ?? 'The backup did not finish.')
-              : 'Backed up: ${file.uri.pathSegments.last}',
+          file != null
+              ? 'Backed up: ${file.uri.pathSegments.last}'
+              : controller.wasStopped
+              ? 'The backup is stopped. Nothing of it was kept.'
+              : (controller.problem ?? 'The backup did not finish.'),
         ),
+      ),
+    );
+  }
+}
+
+/// Something a reset would remove for good, with the red dot.
+class _RiskLine extends StatelessWidget {
+  const _RiskLine(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(padding: EdgeInsets.only(top: 5), child: RiskDot()),
+        const SizedBox(width: Space.s),
+        Expanded(
+          child: Text(text, style: AppType.secondary.copyWith(color: Palette.ink)),
+        ),
+      ],
+    );
+  }
+}
+
+/// What a backup can and cannot bring back, said where a backup is made.
+class Disclaimer extends StatelessWidget {
+  const Disclaimer({super.key});
+
+  static const text =
+      'A backup can bring back only the faces and apps that Tizen Archive has. An installed app cannot be copied off '
+      'the watch, so one the archive does not have is not in your backup.';
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: text,
+      excludeSemantics: true,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 1),
+            child: AppIconView(AppIcon.info, color: Palette.inkSoft, size: 16),
+          ),
+          const SizedBox(width: Space.s),
+          Expanded(
+            child: Text(text, style: AppType.caption.copyWith(color: Palette.inkSoft)),
+          ),
+        ],
       ),
     );
   }

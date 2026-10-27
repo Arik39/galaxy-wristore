@@ -31,7 +31,7 @@ enum LinkPhase {
 }
 
 /// What the phone is doing with the watch.
-enum Job { checking, installing, removing, backingUp, restoring }
+enum Job { checking, installing, removing, backingUp, restoring, ringing, opening }
 
 /// A long job the phone is doing with the watch, as the bezel and the screens show it.
 class Operation {
@@ -50,6 +50,7 @@ class BackupRecord {
     required this.createdAt,
     required this.watch,
     required this.idsWithCopy,
+    this.idsUnsaveable = const {},
     required this.packageCount,
     required this.mediaCount,
   });
@@ -58,8 +59,17 @@ class BackupRecord {
   final DateTime createdAt;
   final String watch;
   final Set<String> idsWithCopy;
+
+  /// Packages the backup could get no copy of for good: Tizen Archive does not have one that fits, and an installed
+  /// package cannot be copied off the watch. (A copy missing because the archive could not be reached is not here: a
+  /// new backup may still get it.)
+  final Set<String> idsUnsaveable;
   final int packageCount;
   final int mediaCount;
+
+  /// Whether a package the backup holds no copy of is one no backup can save: its note says so, unlike a note that
+  /// asks to back up again later.
+  static bool unsaveable(BackupPackage p) => p.entry == null && !(p.note ?? '').contains('again later');
 }
 
 /// A backup service that keeps its backups itself, not as files in the backup folder: the demo's.
@@ -98,6 +108,21 @@ class WatchController extends ChangeNotifier {
   int presentations = 0;
 
   bool _busy = false;
+  bool _ringing = false;
+
+  /// The connection of the job running now, so a stop can close it under the job.
+  WatchConnection? _watch;
+  bool _stopRequested = false;
+
+  /// Whether the last job ended because the user stopped it.
+  bool wasStopped = false;
+
+  /// Completed to drop a connection that waits for the watch's "Allow debugging" answer.
+  Completer<void>? _giveUp;
+  bool _askingAgain = false;
+
+  /// How many times this phone offered its key since the watch last answered, for the screen to say so.
+  int askedTimes = 0;
 
   /// Package pictures fetched from the watch, kept on the phone by package id.
   final Map<String, File> _pictures = {};
@@ -270,6 +295,7 @@ class WatchController extends ChangeNotifier {
     operation = Operation(label);
     if (phase != LinkPhase.connected) phase = LinkPhase.connecting;
     problem = null;
+    wasStopped = false;
     notifyListeners();
     WatchConnection? watch;
     try {
@@ -278,32 +304,85 @@ class WatchController extends ChangeNotifier {
         problem = const LocalNetworkDenied().message;
         return;
       }
-      watch = await services.connector.connect(
-        at,
-        onApprovalNeeded: () {
-          phase = LinkPhase.waitingForApproval;
-          notifyListeners();
-        },
-      );
+      watch = _watch = await _connect(at);
       phase = LinkPhase.connected;
       notifyListeners();
       await work(watch);
       if (celebrate) presentations++;
+    } on _Stopped {
+      wasStopped = true;
     } on WatchException catch (e) {
-      _explain(e, at);
+      // A stop closes the connection under the job: that is the user's doing, not the watch's.
+      if (_stopRequested) {
+        wasStopped = true;
+      } else {
+        _explain(e, at);
+      }
     } on CatalogException catch (e) {
       problem = 'Tizen Archive: ${e.message}';
     } on InvalidPackageException catch (e) {
       problem = 'That file is not a package the watch can install: ${e.message}';
     } on Exception catch (e) {
-      problem = 'Something went wrong: $e';
+      if (_stopRequested) {
+        wasStopped = true;
+      } else {
+        problem = 'Something went wrong: $e';
+      }
     } finally {
+      _watch = null;
       await watch?.close();
       _busy = false;
+      _stopRequested = false;
       job = null;
       operation = null;
       notifyListeners();
     }
+  }
+
+  /// Stops a running backup: a transfer from the watch ends at once, the rest at its next step. Nothing of it is kept.
+  void stopBackUp() {
+    if (job != Job.backingUp || _stopRequested) return;
+    _stopRequested = true;
+    _report(const Operation('Stopping the backup'));
+    _watch?.close();
+  }
+
+  bool get stopping => _stopRequested;
+
+  /// Connects, and connects again each time the user asks for the watch's "Allow debugging" question again.
+  Future<WatchConnection> _connect(WatchAddress at) async {
+    askedTimes = 0;
+    while (true) {
+      final giveUp = _giveUp = Completer<void>();
+      try {
+        final watch = await services.connector.connect(
+          at,
+          giveUp: giveUp.future,
+          onApprovalNeeded: () {
+            askedTimes++;
+            phase = LinkPhase.waitingForApproval;
+            notifyListeners();
+          },
+        );
+        return watch;
+      } on WatchException {
+        if (!_askingAgain) rethrow;
+        _askingAgain = false;
+        phase = LinkPhase.connecting;
+        notifyListeners();
+      } finally {
+        _giveUp = null;
+      }
+    }
+  }
+
+  /// Offers this phone's key to the watch once more, for when its "Allow debugging" question did not show or went
+  /// away: the waiting connection is dropped and a new one makes the watch ask again.
+  void askAgain() {
+    final giveUp = _giveUp;
+    if (phase != LinkPhase.waitingForApproval || giveUp == null || giveUp.isCompleted) return;
+    _askingAgain = true;
+    giveUp.complete();
   }
 
   void _explain(WatchException e, WatchAddress at) {
@@ -370,14 +449,65 @@ class WatchController extends ChangeNotifier {
 
   /// Asks the watch which face it wears. Unverified on real watches: when the answer is not a face it has, the dial
   /// shows the default face rather than a guess.
+  /// Finds the face on the wrist among the running apps: a face runs while the watch shows it. (The watch's own
+  /// setting for it cannot be read over Debugging.) A face's app id is its package id, or starts with it.
   Future<void> _readCurrentFace(WatchConnection watch) async {
     try {
-      final out = await watch.shell('vconftool get db/wms/clock_pkgid 2>/dev/null');
-      final id = RegExp(r'value\s*=\s*([A-Za-z0-9._-]+)').firstMatch(out)?.group(1);
-      currentFaceId = id != null && faces.any((f) => f.id == id) ? id : null;
+      final out = await watch.shell('app_launcher -S 2>/dev/null');
+      final running = {
+        for (final m in RegExp(r'^\s*([A-Za-z0-9._-]+) \(\d+\)\s*$', multiLine: true).allMatches(out)) m.group(1)!,
+      };
+      currentFaceId = faces
+          .where((f) => running.contains(f.id) || running.any((r) => r.startsWith('${f.id}.')))
+          .firstOrNull
+          ?.id;
     } on WatchException {
       currentFaceId = null;
     }
+  }
+
+  // ---- The watch as a remote: ringing it, opening its own screens ----
+
+  /// The watch's own Find My Gear tone, played by its debugging shell. The watch refuses vibration over Debugging, so
+  /// finding it is by sound alone.
+  static const ringTone = '/usr/share/feedback.wearable/sound/System/Find_my_Gear.ogg';
+
+  /// How long the watch rings at most when nobody stops it.
+  static const ringFor = Duration(minutes: 1);
+
+  bool get ringing => job == Job.ringing;
+
+  /// Makes the watch play its find tone again and again until [stopRinging], for at most [ringFor]. It works only while
+  /// the watch is on the same Wi-Fi as the phone.
+  Future<void> ring() => _withWatch(Job.ringing, 'Ringing your watch', (watch) async {
+    _ringing = true;
+    final until = DateTime.now().add(ringFor);
+    while (_ringing && DateTime.now().isBefore(until)) {
+      final out = await watch.shell('paplay $ringTone 2>&1; echo "exit=\$?"');
+      if (!out.contains('exit=0')) {
+        problem = 'Your watch would not play its find tone: ${out.trim().split('\n').first}';
+        break;
+      }
+    }
+    _ringing = false;
+  });
+
+  /// Stops the ringing after the tone that is playing now.
+  void stopRinging() {
+    _ringing = false;
+    notifyListeners();
+  }
+
+  /// Opens one of the watch's own screens, e.g. its sound settings, by app id. Returns null when the watch opened it,
+  /// otherwise why not, in plain words.
+  Future<String?> openOnWatch(String appId) async {
+    if (!_safeId.hasMatch(appId)) return 'That is not something the watch can open.';
+    String? failure;
+    await _withWatch(Job.opening, 'Opening on your watch', (watch) async {
+      final out = await watch.shell('app_launcher -s $appId 2>&1');
+      if (!out.contains('successfully launched')) failure = 'Your watch did not open it: ${out.trim()}';
+    });
+    return problem ?? failure;
   }
 
   // ---- Backups ----
@@ -407,6 +537,10 @@ class WatchController extends ChangeNotifier {
               idsWithCopy: {
                 for (final p in m.packages)
                   if (p.entry != null) p.id,
+              },
+              idsUnsaveable: {
+                for (final p in m.packages)
+                  if (BackupRecord.unsaveable(p)) p.id,
               },
               packageCount: m.packages.length,
               mediaCount: m.media.length,
@@ -454,6 +588,24 @@ class WatchController extends ChangeNotifier {
 
   int get backedUpCount => downloaded.length - notBackedUp.length;
 
+  /// Of what a reset would remove, what no backup can save: the latest backup found no copy in Tizen Archive.
+  List<WatchPackage> get unsaveable {
+    final ids = latestBackup?.idsUnsaveable ?? const <String>{};
+    return [
+      for (final p in notBackedUp)
+        if (ids.contains(p.id)) p,
+    ];
+  }
+
+  /// What a new backup could still save: added since the latest backup, or missed because the archive was not reached.
+  List<WatchPackage> get toBackUp {
+    final unsaveableIds = {for (final p in unsaveable) p.id};
+    return [
+      for (final p in notBackedUp)
+        if (!unsaveableIds.contains(p.id)) p,
+    ];
+  }
+
   void _report(Operation value) {
     operation = value;
     notifyListeners();
@@ -461,6 +613,11 @@ class WatchController extends ChangeNotifier {
 
   static PackageKind kindOf(WatchPackage p) =>
       p.kind ?? (p.id.startsWith('com.watchface.') ? PackageKind.watchFace : PackageKind.app);
+}
+
+/// Thrown from a backup's progress once the user stops it, so the backup ends at its next step and cleans up.
+class _Stopped implements Exception {
+  const _Stopped();
 }
 
 class _Progress implements BackupProgress {
@@ -471,11 +628,14 @@ class _Progress implements BackupProgress {
 
   @override
   void step(String text) {
+    if (_owner._stopRequested) throw const _Stopped();
     _label = text;
     _owner._report(Operation(text, progress: _owner.operation?.progress ?? -1));
   }
 
   @override
-  void percent(int? value) =>
-      _owner._report(Operation(_label, progress: value == null || value < 0 ? -1 : value / 100));
+  void percent(int? value) {
+    if (_owner._stopRequested) throw const _Stopped();
+    _owner._report(Operation(_label, progress: value == null || value < 0 ? -1 : value / 100));
+  }
 }

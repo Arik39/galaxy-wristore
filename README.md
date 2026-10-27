@@ -47,6 +47,9 @@ Android phone.
 - **Backup** replaces Samsung account backup. One `.twbackup` file holds copies of the faces and apps you added, the
   music and pictures on the watch, and a fingerprint of every app. The app tells you plainly what a reset would
   remove for good.
+
+  **It can bring back only the faces and apps that Tizen Archive has.** An installed app cannot be copied off the
+  watch, so one the archive does not have is not in your backup, and a reset removes it for good.
 - **Restore** puts back only what you pick, item by item, with each face's pictures full size.
 - **Faces and Apps** show what is on the watch with its real pictures, mark what is not backed up, offer updates
   from Tizen Archive, and remove what you added.

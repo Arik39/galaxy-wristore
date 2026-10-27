@@ -92,7 +92,8 @@ class SdbSession implements SdbService {
   );
 
   /// Connects to [host] and authorizes with [key]. A key the watch has not seen makes it ask its user, and
-  /// [onApprovalNeeded] is called when that happens; the wait is limited by [SdbOptions.approvalTimeout].
+  /// [onApprovalNeeded] is called when that happens; the wait is limited by [SdbOptions.approvalTimeout]. Completing
+  /// [giveUp] during the handshake drops the connection, so the caller can open a new one and make the watch ask again.
   static Future<SdbSession> connect({
     required String host,
     required int port,
@@ -100,6 +101,7 @@ class SdbSession implements SdbService {
     required String keyName,
     SdbOptions options = const SdbOptions(),
     void Function()? onApprovalNeeded,
+    Future<void>? giveUp,
     SocketConnector? connectSocket,
   }) async {
     final Socket socket;
@@ -115,12 +117,19 @@ class SdbSession implements SdbService {
       // Only a latency hint; a connection that is already gone shows at the first read
     }
     final channel = PacketChannel(socket, maxData: _maxPacket);
+    var shaking = true;
+    // Closing the channel makes the handshake's pending read fail at once, as a watch that dropped the connection.
+    giveUp?.then((_) {
+      if (shaking) channel.close();
+    });
     try {
       final (banner, maxData) = await _handshake(channel, key, keyName, options, onApprovalNeeded);
       return SdbSession._(channel, banner, maxData, options);
     } catch (_) {
       channel.close();
       rethrow;
+    } finally {
+      shaking = false;
     }
   }
 

@@ -5,8 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:galaxy_wristore/app/app.dart';
 import 'package:galaxy_wristore/app/watch_controller.dart';
 import 'package:galaxy_wristore/demo/demo_services.dart';
+import 'package:galaxy_wristore/design/format.dart';
 import 'package:galaxy_wristore/features/backup/restore_page.dart';
 import 'package:galaxy_wristore/features/common/installed_page.dart';
+import 'package:galaxy_wristore/features/watch/watch_settings_page.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -41,7 +43,7 @@ void main() {
       expect(find.text(tab), findsWidgets, reason: tab);
     }
     expect(find.text('ADDED BY YOU · 5'), findsNothing); // the Apps page is now off stage
-    expect(find.text('Today, 11:47'), findsWidgets);
+    expect(find.text(formatWhen(controller.backups.first.createdAt)), findsWidgets);
   });
 
   for (final (name, size, ratio) in [
@@ -125,5 +127,13 @@ void main() {
         .push(MaterialPageRoute<void>(builder: (_) => InstalledPage(package: controller.faces.first)));
     await tester.pump(const Duration(milliseconds: 800));
     expect(tester.takeException(), isNull, reason: 'Face');
+
+    await tester.tap(find.byTooltip('Watch'));
+    await tester.pump(const Duration(milliseconds: 600));
+    Navigator.of(tester.element(find.text('My Watch').first))
+        .push(MaterialPageRoute<void>(builder: (_) => const WatchSettingsPage()));
+    await tester.pump(const Duration(milliseconds: 800));
+    expect(find.text('Watch settings'), findsWidgets);
+    expect(tester.takeException(), isNull, reason: 'Watch settings');
   });
 }

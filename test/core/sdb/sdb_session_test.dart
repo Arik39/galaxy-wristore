@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -69,6 +70,39 @@ void main() {
       approvalTimeout: const Duration(milliseconds: 300),
     );
     await expectLater(connect(fake, options: options), _fails(WatchError.approvalTimeout));
+  });
+
+  test('giving up while the watch asks drops that connection at once, and a new one asks again', () async {
+    final fake = await watch()
+      ..confirmDelay = const Duration(seconds: 3);
+    final giveUp = Completer<void>();
+    var asked = 0;
+    final started = DateTime.now();
+    final first = SdbSession.connect(
+      host: '127.0.0.1',
+      port: fake.port,
+      key: key,
+      keyName: 'phone@test',
+      options: const SdbOptions(readTimeout: Duration(seconds: 5), approvalTimeout: Duration(seconds: 5)),
+      onApprovalNeeded: () {
+        asked++;
+        giveUp.complete();
+      },
+      giveUp: giveUp.future,
+    );
+    await expectLater(first, _fails(WatchError.approvalTimeout));
+    expect(DateTime.now().difference(started), lessThan(const Duration(seconds: 2)));
+    expect(asked, 1);
+
+    // Once the watch is showing its question for the dropped connection, a new connection makes it ask again.
+    while (fake.confirmations < 1) {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    }
+    fake.confirmDelay = Duration.zero;
+    final second = await connect(fake, onApprovalNeeded: () => asked++);
+    expect(second.banner, 'device::SM-R800::0');
+    expect(fake.confirmations, 2);
+    expect(asked, 2);
   });
 
   test('a watch that closes at once is busy, one that resets the connection too', () async {

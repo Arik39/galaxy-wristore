@@ -210,8 +210,10 @@ abstract interface class WatchConnection {
 
 /// Opens [WatchConnection]s with the app's own key. The key is made once and kept in the platform's secure storage;
 /// the first time, the watch asks its user to allow this phone, and [onApprovalNeeded] lets the screen say so.
+/// Completing [giveUp] drops a connection still waiting for that answer (it then fails with
+/// [WatchError.approvalTimeout]), so a new one can make the watch ask again.
 abstract interface class WatchConnector {
-  Future<WatchConnection> connect(WatchAddress address, {void Function()? onApprovalNeeded});
+  Future<WatchConnection> connect(WatchAddress address, {void Function()? onApprovalNeeded, Future<void>? giveUp});
 }
 
 /// A watch found by [WatchFinder]: something answering sdb at [address]. [busy] when another host holds it.

@@ -44,7 +44,11 @@ class SdbWatchConnector implements WatchConnector {
   Future<SdbKey>? _key;
 
   @override
-  Future<WatchConnection> connect(WatchAddress address, {void Function()? onApprovalNeeded}) async {
+  Future<WatchConnection> connect(
+    WatchAddress address, {
+    void Function()? onApprovalNeeded,
+    Future<void>? giveUp,
+  }) async {
     final session = await SdbSession.connect(
       host: address.host,
       port: WatchAddress.sdbPort,
@@ -52,6 +56,7 @@ class SdbWatchConnector implements WatchConnector {
       keyName: keyName,
       options: options,
       onApprovalNeeded: onApprovalNeeded,
+      giveUp: giveUp,
       connectSocket: _connectSocket,
     );
     try {

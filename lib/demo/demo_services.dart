@@ -42,11 +42,17 @@ class _DemoConnector implements WatchConnector {
   bool _allowed = false;
 
   @override
-  Future<WatchConnection> connect(WatchAddress address, {void Function()? onApprovalNeeded}) async {
+  Future<WatchConnection> connect(
+    WatchAddress address, {
+    void Function()? onApprovalNeeded,
+    Future<void>? giveUp,
+  }) async {
     await Future<void>.delayed(const Duration(milliseconds: 700));
     if (!_allowed) {
       onApprovalNeeded?.call();
-      await Future<void>.delayed(const Duration(milliseconds: 1600));
+      var gaveUp = false;
+      await Future.any([Future<void>.delayed(const Duration(milliseconds: 1600)), ?giveUp?.then((_) => gaveUp = true)]);
+      if (gaveUp) throw const WatchException(WatchError.approvalTimeout, 'The watch did not allow this phone');
       _allowed = true;
     }
     return _DemoConnection(address);
@@ -141,8 +147,14 @@ class _DemoConnection implements WatchConnection {
   Future<String> shell(String command) async {
     final pkginfo = RegExp(r'^pkginfo --pkg ([A-Za-z0-9._-]+)$').firstMatch(command);
     if (pkginfo != null) return 'Icon: /opt/usr/globalapps/${pkginfo.group(1)}/shared/res/icon.png\n';
-    if (command.startsWith('vconftool get db/wms/clock_pkgid')) {
-      return 'db/wms/clock_pkgid, value = com.watchface.GSHybrid7 (string)\n';
+    if (command.startsWith('app_launcher -S')) {
+      return '\t appId (PID)\n\t  com.samsung.w-home (3279)\n\t  com.watchface.GSHybrid7 (8561)\n\t  com.samsung.weather-widget (6560)\n';
+    }
+    final launch = RegExp(r'^app_launcher -s ([A-Za-z0-9._-]+)').firstMatch(command);
+    if (launch != null) return '... successfully launched pid = 4242 with debug 0\n';
+    if (command.startsWith('paplay ')) {
+      await Future<void>.delayed(const Duration(milliseconds: 1800));
+      return 'exit=0\n';
     }
     return '';
   }
@@ -350,8 +362,11 @@ class _DemoInspector implements PackageInspector {
 /// The demo's backups, kept in memory: one made this morning that lacks three of the faces, and any made since.
 class _DemoBackups implements BackupService, KnownBackups {
   _DemoBackups() {
+    // This morning at 11:47, or yesterday's when it is not yet 11:47: a backup is never in the future.
     final now = DateTime.now();
-    _add(DateTime(now.year, now.month, now.day, 11, 47), {
+    var at = DateTime(now.year, now.month, now.day, 11, 47);
+    if (at.isAfter(now)) at = at.subtract(const Duration(days: 1));
+    _add(at, {
       for (final p in _DemoConnection._packages)
         if (p.origin == PackageOrigin.downloaded &&
             !const {'com.watchface.GSHybrid7', 'com.watchface.GSHybrid6', 'com.watchface.MD210'}.contains(p.id))
@@ -388,13 +403,17 @@ class _DemoBackups implements BackupService, KnownBackups {
   @override
   List<BackupRecord> get records => List.unmodifiable(_made);
 
-  BackupRecord _add(DateTime at, Set<String> ids) {
+  /// A face the demo archive does not have, so a demo backup shows what no backup can save.
+  static const _notInArchive = 'com.watchface.MD210';
+
+  BackupRecord _add(DateTime at, Set<String> ids, {Set<String> unsaveable = const {}}) {
     final record = BackupRecord(
       file: File('demo-backup-${at.millisecondsSinceEpoch}.twbackup'),
       createdAt: at,
       watch: 'device::SM-R800::0',
       idsWithCopy: ids,
-      packageCount: _DemoConnection._packages.where((p) => p.origin == PackageOrigin.downloaded).length,
+      idsUnsaveable: unsaveable,
+      packageCount: ids.length + unsaveable.length,
       mediaCount: _media.length,
     );
     _made.add(record);
@@ -422,10 +441,15 @@ class _DemoBackups implements BackupService, KnownBackups {
       }
     }
     progress.percent(null);
-    return _add(DateTime.now(), {
+    final downloaded = {
       for (final p in _DemoConnection._packages)
         if (p.origin == PackageOrigin.downloaded) p.id,
-    }).file!;
+    };
+    return _add(
+      DateTime.now(),
+      downloaded.difference(const {_notInArchive}),
+      unsaveable: downloaded.intersection(const {_notInArchive}),
+    ).file!;
   }
 
   @override
@@ -476,9 +500,10 @@ class _DemoContents implements BackupContents {
   late final BackupManifest manifest = BackupManifest(
     createdAt: _record.createdAt.toIso8601String(),
     watch: _record.watch,
+    // A backup holds what was on the watch when it was made: the packages it copied and those it could not.
     packages: [
       for (final p in _DemoConnection._packages)
-        if (p.origin == PackageOrigin.downloaded)
+        if (_record.idsWithCopy.contains(p.id) || _record.idsUnsaveable.contains(p.id))
           BackupPackage(
             id: p.id,
             name: p.name,
@@ -488,6 +513,7 @@ class _DemoContents implements BackupContents {
             entry: _record.idsWithCopy.contains(p.id) ? 'packages/${p.name} (${p.id}) v${p.version}.${p.type}' : null,
             entryVersion: p.version,
             source: 'Tizen Archive',
+            note: _record.idsWithCopy.contains(p.id) ? null : 'Not in Tizen Archive: a reset removes it for good.',
           ),
     ],
     media: _DemoBackups._media,

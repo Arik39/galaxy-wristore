@@ -93,13 +93,23 @@ Feature parity with the Mac app (`tizen-companion-installer/cli`, the `tizen-wat
   - a report of what has no copy.
 - **Restore:** choose apps, faces and files one by one, with thumbnails and full-size zoomable pictures. It installs only what the watch lacks or has older, and copies files back into the media folder only.
 
-Features of the original app to verify on the watch over `sdb`, each to be confirmed before it is designed as working:
-- setting the active watch face, and its customisation;
-- launching and uninstalling apps;
-- adding music and pictures to the watch;
-- battery, storage and "About watch" details;
-- watch settings (display, sounds, notifications);
-- "Find my watch".
+Features of the original app, tested on the owner's SM-R800 (Tizen 5.5) over `sdb` on 2026-10-26. The debugging shell runs as `owner` with the Smack label `User::Shell`.
+- **Works:**
+  - "Find my watch" by sound: `paplay` plays the watch's own `/usr/share/feedback.wearable/sound/System/Find_my_Gear.ogg`.
+  - Opening the watch's own screens with `app_launcher -s <appid>`: Sound, Volume, Ringtones and tones, Notifications, Do not disturb, Display, the quick-settings editor and the apps view. Each change is made on the watch.
+  - Knowing the face on the wrist: `app_launcher -S` lists running apps, and the face is one of them.
+- **Refused by the watch:**
+  - Vibration: feedbackd requires the `haptic` privilege.
+  - Turning the screen on: `devicectl display` fails.
+  - Reading or changing settings: `vconftool` and `buxton2ctl` cannot be run.
+  - Choosing the face: a face that is not showing cannot be launched.
+  - Customizing the face: the watch-face editor opens blank when started without the face to edit, and the debugging link cannot pass one.
+  - App order and widgets: the home screen's data is unreadable.
+- **No way around it:** a helper app on the watch would need a store signature, and Samsung no longer issues certificates. Even a signed app could not change most system settings, which need Samsung's platform signature.
+- **Still to verify:**
+  - uninstalling apps;
+  - adding music and pictures;
+  - battery and storage details.
 
 These stay with Samsung's app, because they run over Samsung's Bluetooth protocols that a third-party app cannot use:
 - pairing and the Bluetooth connection;

@@ -98,6 +98,8 @@ class _InstalledPageState extends State<InstalledPage> {
     final face = WatchController.kindOf(p) == PackageKind.watchFace;
     final added = p.origin == PackageOrigin.downloaded;
     final unsaved = c.notBackedUp.any((n) => n.id == p.id);
+    // Tizen Archive has no copy of it: a reset would remove it, and backing up again would not help.
+    final unsaveable = c.unsaveable.any((n) => n.id == p.id);
     final backup = c.latestBackup;
     final picture = c.pictureOf(p.id);
     final ready = c.phase == LinkPhase.connected && c.operation == null;
@@ -149,7 +151,7 @@ class _InstalledPageState extends State<InstalledPage> {
                 !added
                     ? 'A reset keeps it'
                     : unsaved || backup == null
-                    ? 'Not backed up'
+                    ? (unsaveable ? 'Cannot be backed up' : 'Not backed up')
                     : formatWhen(backup.createdAt),
                 risk: added && unsaved,
               ),
@@ -161,9 +163,20 @@ class _InstalledPageState extends State<InstalledPage> {
                   canUpdate ? 'Version $newer available' : 'Version $newer, not installable',
                 _Found() => 'Up to date',
               }),
+              // Faces are worn and customized on the watch: the debugging link can do neither.
+              if (face)
+                Padding(
+                  padding: const EdgeInsets.only(top: Space.m),
+                  child: Text(
+                    p.id == c.currentFaceId
+                        ? 'To customize it, touch and hold it on your watch.'
+                        : 'To wear it, touch and hold the face on your watch, then swipe to it and tap.',
+                    style: AppType.caption.copyWith(color: Palette.inkSoft),
+                  ),
+                ),
               if (unsaved || added || canUpdate) const SizedBox(height: Space.xxl),
               // White is kept for one button: backing up comes first while the backup lacks this.
-              if (unsaved) ...[
+              if (unsaved && !unsaveable) ...[
                 AppButton(label: 'Back up now', onPressed: ready ? c.backUp : null, expand: true),
                 const SizedBox(height: Space.s),
               ],
@@ -173,7 +186,7 @@ class _InstalledPageState extends State<InstalledPage> {
               ] else if (canUpdate) ...[
                 AppButton(
                   label: 'Update to $newer',
-                  filled: !unsaved,
+                  filled: !unsaved || unsaveable,
                   expand: true,
                   onPressed: ready ? () => _update(c, p, newer) : null,
                 ),

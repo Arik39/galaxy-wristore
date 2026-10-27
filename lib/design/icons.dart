@@ -27,6 +27,12 @@ enum AppIcon {
 
   /// A file coming in: adding a backup file or a package file.
   fileIn,
+
+  /// A bell: ringing the watch to find it.
+  ring,
+
+  /// Out of the box: opens on the watch.
+  openOut,
 }
 
 class AppIconView extends StatelessWidget {
@@ -203,6 +209,19 @@ Path _path(AppIcon icon) => switch (icon) {
     _circle(12, 12, 9),
     _poly([12, 11, 12, 16.5]),
     _poly([12, 7.6, 12, 7.8]),
+  ]),
+  AppIcon.ring => _all([
+    _poly([6, 16.5, 6, 11]),
+    _arc(6, 11, 6, 18, 11),
+    _poly([18, 11, 18, 16.5]),
+    _poly([4.5, 16.5, 19.5, 16.5]),
+    _arc(10, 19.2, 2.1, 14, 19.2, clockwise: false),
+    _poly([12, 3.4, 12, 5]),
+  ]),
+  AppIcon.openOut => _all([
+    _poly([13.5, 4, 20, 4, 20, 10.5]),
+    _poly([20, 4, 11, 13]),
+    _poly([17, 13.5, 17, 19, 5, 19, 5, 7, 10.5, 7]),
   ]),
   AppIcon.fileIn => _all([
     _poly([13.5, 3, 6, 3, 6, 21, 18, 21, 18, 7.5, 13.5, 3]),
