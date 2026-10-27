@@ -291,13 +291,14 @@ class _BackupRow extends StatelessWidget {
                   'restore' => Navigator.of(
                     context,
                   ).push(MaterialPageRoute<void>(builder: (_) => RestorePage(record: record))),
+                  'share' when _desktop => _saveCopy(context, file),
                   'share' => SharePlus.instance.share(ShareParams(files: [XFile(file.path)], subject: 'Watch backup')),
                   _ => _delete(context, file),
                 },
-                itemBuilder: (_) => const [
-                  PopupMenuItem(value: 'restore', child: Text('Restore from it')),
-                  PopupMenuItem(value: 'share', child: Text('Save or share the file')),
-                  PopupMenuItem(
+                itemBuilder: (_) => [
+                  const PopupMenuItem(value: 'restore', child: Text('Restore from it')),
+                  PopupMenuItem(value: 'share', child: Text(_desktop ? 'Save a copy' : 'Save or share the file')),
+                  const PopupMenuItem(
                     value: 'delete',
                     child: Text('Delete', style: TextStyle(color: Palette.alert)),
                   ),
@@ -307,6 +308,20 @@ class _BackupRow extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Computers save a copy where the user picks: sharing a file is not offered on every desktop.
+  static final _desktop = Platform.isMacOS || Platform.isWindows || Platform.isLinux;
+
+  Future<void> _saveCopy(BuildContext context, File file) async {
+    final saved = await FilePicker.saveFile(
+      dialogTitle: 'Save a copy of the backup',
+      fileName: file.uri.pathSegments.last,
+      bytes: await file.readAsBytes(),
+    );
+    if (saved != null && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('A copy of the backup is saved.')));
+    }
   }
 
   Future<void> _delete(BuildContext context, File file) async {

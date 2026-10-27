@@ -4,5 +4,5 @@ contact_links:
     url: https://tizen-archive.com
     about: Discover shows Tizen Archive's catalog. Missing or broken packages are for Tizen Archive to fix.
   - name: Report a security problem
-    url: https://github.com/Arik39/galaxy-wristore/security/policy
+    url: https://github.com/Arik39/galaxy-wristore/security/advisories/new
     about: Please report vulnerabilities privately, not as public issues.

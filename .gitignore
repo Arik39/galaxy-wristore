@@ -48,11 +48,19 @@ app.*.map.json
 .widget_preview/
 
 # Galaxy Wristore
-# Private design references (e.g. pictures from the owner's own backup): never commit.
-.impeccable/refs/private/
+# Design working files, references and mock-ups stay on this computer.
+.impeccable/
 # Backups, package files and keys belong to their owners, not to the repository.
 *.twbackup
 *.tpk
 *.wgt
 *.pem
 *.p12
+*.jks
+*.keystore
+key.properties
+.env
+
+# Markdown files stay on this computer. README.md at the top is the only one published.
+*.md
+!/README.md

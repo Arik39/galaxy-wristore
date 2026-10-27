@@ -1,16 +1,45 @@
 name: Release
 
-# Pushing a tag like v1.0.0 builds the signed Android APK and publishes it as a GitHub release. The tag must match the
-# version in pubspec.yaml. A tag with a hyphen (v1.1.0-beta.1) is published as a pre-release.
+# Pushing a version tag such as v1.0.0 builds the app for Android, Windows, macOS and Linux and publishes all four
+# as one GitHub release. The tag must match the version in pubspec.yaml; a tag with a hyphen (v1.1.0-beta.1) becomes a
+# pre-release, and the message of an annotated tag becomes the release's "What's new". Running the workflow by hand
+# from the Actions tab builds everything without publishing, to check that a release would work.
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+
+env:
+  FLUTTER_VERSION: 3.47.7
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the tag matches pubspec.yaml
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          version=$(sed -nE 's/^version: *([^+]+).*/\1/p' pubspec.yaml)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match version $version in pubspec.yaml."
+            exit 1
+          fi
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+
   android:
+    needs: check
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -22,17 +51,8 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: 3.47.7
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
-
-      - name: Check the tag matches pubspec.yaml
-        run: |
-          version=$(sed -nE 's/^version: *([^+]+).*/\1/p' pubspec.yaml)
-          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME does not match version $version in pubspec.yaml."
-            exit 1
-          fi
-
       - name: Write the release key
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -40,40 +60,172 @@ jobs:
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          # A release signed with any other key could never be updated in place, so stop rather than fall back.
+          # An APK signed with any other key could never be updated in place, so stop rather than fall back.
           if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then
-            echo "::error::The Android signing secrets are not set. See CONTRIBUTING.md, Releasing."
+            echo "::error::The Android signing secrets are not set in the repository's Actions secrets."
             exit 1
           fi
           echo "$KEYSTORE_BASE64" | base64 --decode > android/release.jks
           printf 'storeFile=release.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
             "$KEYSTORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > android/key.properties
-
-      - run: flutter pub get
-      - run: flutter test
       - run: flutter build apk --release
+      - run: |
+          mkdir dist
+          cp build/app/outputs/flutter-apk/app-release.apk dist/galaxy-wristore-android.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: dist/galaxy-wristore-android.apk
+          if-no-files-found: error
 
-      - name: Name the APK and its checksum
+  windows:
+    needs: check
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter build windows --release
+      - name: Zip the app with the Visual C++ runtime it needs
+        shell: pwsh
         run: |
-          cp build/app/outputs/flutter-apk/app-release.apk galaxy-wristore.apk
-          sha256sum galaxy-wristore.apk > galaxy-wristore.apk.sha256
+          $app = "dist\Galaxy Wristore"
+          New-Item -ItemType Directory -Force -Path $app | Out-Null
+          Copy-Item -Recurse "build\windows\x64\runner\Release\*" $app
+          # Without these, the app does not start on a PC that lacks the Visual C++ Redistributable.
+          foreach ($dll in "msvcp140.dll", "vcruntime140.dll", "vcruntime140_1.dll") {
+            Copy-Item "$env:WINDIR\System32\$dll" $app
+          }
+          Compress-Archive -Path $app -DestinationPath "dist\galaxy-wristore-windows-x64.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: dist/galaxy-wristore-windows-x64.zip
+          if-no-files-found: error
 
+  macos:
+    needs: check
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter build macos --release
+      - name: Make the disk image
+        run: |
+          mkdir -p dist/stage
+          cp -R "build/macos/Build/Products/Release/Galaxy Wristore.app" dist/stage/
+          ln -s /Applications dist/stage/Applications
+          # hdiutil now and then finds its device busy on a fresh runner; a second try works.
+          for attempt in 1 2 3; do
+            hdiutil create -volname "Galaxy Wristore" -srcfolder dist/stage -ov -format UDZO \
+              dist/galaxy-wristore-macos.dmg && break
+            sleep 10
+          done
+          hdiutil verify dist/galaxy-wristore-macos.dmg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: dist/galaxy-wristore-macos.dmg
+          if-no-files-found: error
+
+  linux:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install what the Linux build needs
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libsecret-1-dev liblzma-dev \
+            libstdc++-12-dev
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter build linux --release
+      - run: |
+          mkdir dist
+          tar -czf dist/galaxy-wristore-linux-x64.tar.gz -C build/linux/x64/release \
+            --transform 's,^bundle,galaxy-wristore,' bundle
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: dist/galaxy-wristore-linux-x64.tar.gz
+          if-no-files-found: error
+
+  publish:
+    needs: [android, windows, macos, linux]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Write the checksums
+        run: cd dist && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cat > notes.md <<'EOF'
-          ## Install on Android
+          # The checkout keeps tags light; fetch this one whole to read its message.
+          git fetch --force origin "refs/tags/$GITHUB_REF_NAME:refs/tags/$GITHUB_REF_NAME"
+          {
+            if [ "$(git cat-file -t "$GITHUB_REF_NAME")" = tag ]; then
+              echo "## What's new"
+              echo
+              git tag -l --format='%(contents:subject)' "$GITHUB_REF_NAME"
+              echo
+              git tag -l --format='%(contents:body)' "$GITHUB_REF_NAME"
+              echo
+            fi
+            cat <<'EOF'
+          ## Download
 
-          1. On your phone, download **galaxy-wristore.apk** below.
-          2. Open it. If Android asks, allow your browser or Files app to install unknown apps, then tap **Install**.
-          3. Set up the watch as the [README](https://github.com/${{ github.repository }}#set-up-the-watch) shows.
+          Pick the file for your device below, under Assets.
 
-          Already installed? This version installs over it and keeps your backups.
+          | Your device | File |
+          | :--- | :--- |
+          | Android phone, Android 7.0 or later | `galaxy-wristore-android.apk` |
+          | Windows PC, Windows 10 or 11 (64-bit) | `galaxy-wristore-windows-x64.zip` |
+          | Mac, macOS 12 or later | `galaxy-wristore-macos.dmg` |
+          | Linux PC (64-bit) | `galaxy-wristore-linux-x64.tar.gz` |
 
-          `galaxy-wristore.apk.sha256` holds the file's SHA-256, to check the download.
+          ## Install
+
+          **Android.** Download the APK on your phone and open it. If Android asks, allow your browser or Files app to install apps, then tap Install. If Play Protect says it does not know the app, tap More details and then Install anyway. A newer version installs over the old one and keeps your backups.
+
+          **Windows.** Unzip the file, open the Galaxy Wristore folder and run `galaxy_wristore.exe`. Keep everything in that folder together. Windows may say "Windows protected your PC" because the app has no paid code signing certificate. Click More info, then Run anyway.
+
+          **Mac.** Open the disk image and drag Galaxy Wristore into Applications. The first time you open it, macOS says it cannot check the app, because it is not notarised by Apple. Click Done, open System Settings, go to Privacy & Security, scroll down and click Open Anyway next to Galaxy Wristore. You only need to do this once. When the app asks to find devices on your local network, allow it.
+
+          **Linux.** Extract the archive and run `galaxy_wristore` in the galaxy-wristore folder. It needs GTK 3 and a keyring such as GNOME Keyring or KWallet, which most desktops already have. Choosing files needs zenity or kdialog.
+
+          ## Before you connect
+
+          Turn on Debugging on the watch once, as the [README](https://github.com/${{ github.repository }}#set-up-the-watch) shows, and keep the watch on the same Wi-Fi network as your phone or computer.
+
+          ## Check your download
+
+          `SHA256SUMS.txt` lists the SHA-256 checksum of every file. Every Android release is signed with the same key, so updates install over each other.
           EOF
+          } > notes.txt
           prerelease=""
           case "$GITHUB_REF_NAME" in *-*) prerelease="--prerelease" ;; esac
-          gh release create "$GITHUB_REF_NAME" galaxy-wristore.apk galaxy-wristore.apk.sha256 \
-            --title "Galaxy Wristore ${GITHUB_REF_NAME#v}" --notes-file notes.md --generate-notes $prerelease
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --title "Galaxy Wristore ${GITHUB_REF_NAME#v}" --notes-file notes.txt $prerelease

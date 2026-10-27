@@ -7,8 +7,8 @@ bundle=app.wristore.galaxyWristore
 out=docs/screenshots
 raw=$(mktemp -d)
 # name:tab:page, using the WRISTORE_TAB and WRISTORE_OPEN switches in lib/app/app.dart.
-shots=(watch:watch: faces:faces: face:faces:face apps:apps: discover:discover: package:discover:package
-  backup:backup: restore:backup:restore)
+shots=(watch:watch: faces:faces: apps:apps: discover:discover: package:discover:package
+  backup:backup: restore:backup:restore settings:watch:settings)
 
 xcrun simctl status_bar booted override --time 9:41 --dataNetwork wifi --wifiMode active --wifiBars 3 \
   --cellularMode active --cellularBars 4 --batteryState discharging --batteryLevel 100

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The app's near-black ground behind the bezel. -->
+<!-- The icon's amber, as tool/app_icon_test.dart draws it. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/stage" />
+    <solid android:color="#F9B22C" />
 </shape>
