@@ -100,6 +100,10 @@ To hear about new versions, choose **Watch → Custom → Releases** at the top 
 
 A new version installs over the old one and keeps your backups.
 
+Each release also has `galaxy-wristore-android-arm64.apk`, the same app in a smaller download for 64-bit phones, which
+most phones of recent years are. If your phone says it cannot install it, use the main APK. Either one updates the
+other.
+
 ### Windows
 
 1. Download the zip file, right-click it and choose **Extract All**.

@@ -72,10 +72,18 @@ jobs:
       - run: |
           mkdir dist
           cp build/app/outputs/flutter-apk/app-release.apk dist/galaxy-wristore-android.apk
+      # The same app with only the code for 64-bit phones, at about a third of the size, for app stores with a size
+      # limit such as IzzyOnDroid. Splitting by CPU keeps the other CPUs' libraries out, so 32-bit phones refuse it
+      # instead of crashing, and the forced version code lets either APK update the other.
+      - name: Build the smaller APK for 64-bit phones
+        run: |
+          flutter build apk --release --split-per-abi --target-platform android-arm64 \
+            -P force-version-code-ignoring-abi=true
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk dist/galaxy-wristore-android-arm64.apk
       - uses: actions/upload-artifact@v4
         with:
           name: android
-          path: dist/galaxy-wristore-android.apk
+          path: dist/*.apk
           if-no-files-found: error
 
   windows:
@@ -202,13 +210,14 @@ jobs:
           | Your device | File |
           | :--- | :--- |
           | Android phone, Android 7.0 or later | `galaxy-wristore-android.apk` |
+          | Android phone, smaller download for 64-bit phones | `galaxy-wristore-android-arm64.apk` |
           | Windows PC, Windows 10 or 11 (64-bit) | `galaxy-wristore-windows-x64.zip` |
           | Mac, macOS 12 or later | `galaxy-wristore-macos.dmg` |
           | Linux PC (64-bit) | `galaxy-wristore-linux-x64.tar.gz` |
 
           ## Install
 
-          **Android.** Download the APK on your phone and open it. If Android asks, allow your browser or Files app to install apps, then tap Install. If Play Protect says it does not know the app, tap More details and then Install anyway. A newer version installs over the old one and keeps your backups.
+          **Android.** Download the APK on your phone and open it. If Android asks, allow your browser or Files app to install apps, then tap Install. If Play Protect says it does not know the app, tap More details and then Install anyway. A newer version installs over the old one and keeps your backups. The arm64 APK is the same app in a smaller download for 64-bit phones, which most phones of recent years are. If your phone says it cannot install it, use the other APK.
 
           **Windows.** Unzip the file, open the Galaxy Wristore folder and run `galaxy_wristore.exe`. Keep everything in that folder together. Windows may say "Windows protected your PC" because the app has no paid code signing certificate. Click More info, then Run anyway.
 

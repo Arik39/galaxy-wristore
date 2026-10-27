@@ -1,0 +1,13 @@
+Galaxy Wristore looks after a Samsung Tizen watch, such as a Gear S3, Galaxy Watch, Galaxy Watch Active2 or Galaxy Watch3, from your phone. Samsung stopped Tizen downloads on 30 September 2025, so the Galaxy Store can no longer give back a face or an app once a watch is reset. Galaxy Wristore replaces the parts of Samsung's watch app that went with it.
+
+Discover searches Tizen Archive for faces and apps and installs them in one tap. Every download is checked against the archive's checksum and size before it reaches the watch. You can also install a .tpk or .wgt file you already have.
+
+Backup keeps the faces and apps you added, the music and pictures on the watch, and a fingerprint of every app, in one file you can save anywhere. It tells you plainly what a reset would remove for good, such as an app that Tizen Archive does not have. Restore puts back only what you pick.
+
+Faces and Apps show what is on the watch with its real pictures, mark what is not backed up, offer updates from Tizen Archive and remove what you added. You can also ring the watch when you cannot find it, and open its own settings screens.
+
+The app talks to the watch directly over its Wi-Fi debugging link, so it needs neither Galaxy Wearable nor a Samsung account. Turn on Debugging on the watch once, and keep the watch on the same Wi-Fi as your phone.
+
+There are no ads, analytics or trackers. The app connects only to Tizen Archive and to your watch on your own network.
+
+Galaxy Wristore is open source under the Apache License 2.0. It is not affiliated with or endorsed by Samsung.

@@ -56,6 +56,13 @@ android {
             signingConfig = signingConfigs.getByName(if (hasReleaseKey) "release" else "debug")
         }
     }
+
+    // Leaves out the list of libraries that Android's build tools seal into an APK for Google Play, which only Google
+    // can read. The app is not on Google Play, and open source stores such as IzzyOnDroid ask for APKs without it.
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
 }
 
 kotlin {
