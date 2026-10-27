@@ -1,0 +1,79 @@
+name: Release
+
+# Pushing a tag like v1.0.0 builds the signed Android APK and publishes it as a GitHub release. The tag must match the
+# version in pubspec.yaml. A tag with a hyphen (v1.1.0-beta.1) is published as a pre-release.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.7
+          cache: true
+
+      - name: Check the tag matches pubspec.yaml
+        run: |
+          version=$(sed -nE 's/^version: *([^+]+).*/\1/p' pubspec.yaml)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match version $version in pubspec.yaml."
+            exit 1
+          fi
+
+      - name: Write the release key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          # A release signed with any other key could never be updated in place, so stop rather than fall back.
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then
+            echo "::error::The Android signing secrets are not set. See CONTRIBUTING.md, Releasing."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/release.jks
+          printf 'storeFile=release.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
+            "$KEYSTORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > android/key.properties
+
+      - run: flutter pub get
+      - run: flutter test
+      - run: flutter build apk --release
+
+      - name: Name the APK and its checksum
+        run: |
+          cp build/app/outputs/flutter-apk/app-release.apk galaxy-wristore.apk
+          sha256sum galaxy-wristore.apk > galaxy-wristore.apk.sha256
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > notes.md <<'EOF'
+          ## Install on Android
+
+          1. On your phone, download **galaxy-wristore.apk** below.
+          2. Open it. If Android asks, allow your browser or Files app to install unknown apps, then tap **Install**.
+          3. Set up the watch as the [README](https://github.com/${{ github.repository }}#set-up-the-watch) shows.
+
+          Already installed? This version installs over it and keeps your backups.
+
+          `galaxy-wristore.apk.sha256` holds the file's SHA-256, to check the download.
+          EOF
+          prerelease=""
+          case "$GITHUB_REF_NAME" in *-*) prerelease="--prerelease" ;; esac
+          gh release create "$GITHUB_REF_NAME" galaxy-wristore.apk galaxy-wristore.apk.sha256 \
+            --title "Galaxy Wristore ${GITHUB_REF_NAME#v}" --notes-file notes.md --generate-notes $prerelease

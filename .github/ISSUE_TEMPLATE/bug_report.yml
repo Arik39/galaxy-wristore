@@ -1,0 +1,52 @@
+name: Bug report
+description: Something does not work as it should.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Thank you for reporting. If the app cannot find or connect to your watch, first try the
+        [Troubleshooting](https://github.com/Arik39/galaxy-wristore#troubleshooting) steps in the README.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what happened instead. Include any message the app showed.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open Discover
+        2. Tap a face
+        3. Tap Install on my watch
+  - type: input
+    id: app-version
+    attributes:
+      label: App version
+      description: The version from the release you installed.
+      placeholder: 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: phone
+    attributes:
+      label: Phone
+      placeholder: Pixel 8, Android 15
+    validations:
+      required: true
+  - type: input
+    id: watch
+    attributes:
+      label: Watch
+      description: Model and software version, from Settings → About watch on the watch.
+      placeholder: Galaxy Watch Active2 44 mm, Tizen 5.5
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or anything else
+      description: Screenshots help a lot. Do not attach backups or package files; they may hold personal data.

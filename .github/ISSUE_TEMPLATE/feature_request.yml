@@ -1,0 +1,26 @@
+name: Feature request
+description: An idea that would make the app more useful.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Some things cannot be done by any app other than Samsung's, such as pairing, notifications and health sync.
+        The README's [What it cannot do](https://github.com/Arik39/galaxy-wristore#what-it-cannot-do) explains why.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would you like to do?
+      description: The problem or task, in your own words. What happens today?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: How could the app help?
+      description: Your idea for it, if you have one.
+  - type: input
+    id: watch
+    attributes:
+      label: Watch
+      description: Your watch model, if it matters for this.
