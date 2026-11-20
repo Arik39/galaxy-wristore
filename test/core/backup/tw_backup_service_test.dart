@@ -345,7 +345,7 @@ void main() {
       );
       expect(result.failed, [
         'My App: The watch refused the file: No space left on device',
-        'Weather: the watch refused it (Image error -24)',
+        'Weather: the watch refused it: Image error (-24)',
         '$_mp3Path: The watch refused the file: No space left on device',
       ]);
     });

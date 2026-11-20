@@ -77,7 +77,7 @@ class _FilePackagePageState extends State<FilePackagePage> {
         ? (controller.problem ?? 'Your watch could not be reached.')
         : result.success
         ? '$name is on your watch.'
-        : 'Your watch refused it: ${result.message ?? result.code ?? 'no reason given'}.';
+        : 'Your watch refused it: ${result.reason}.';
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
     if (result?.success ?? false) Navigator.of(context).maybePop();
   }

@@ -266,7 +266,7 @@ watch only while its screen is on.
 Network**, on a Mac in **System Settings → Privacy & Security → Local Network**.
 
 **The watch refused a package.** The watch installs only store-signed packages, and some are made for specific watch
-models.
+models. The message gives the watch's own reason and code; please include it when you report a problem.
 
 ## What it cannot do
 

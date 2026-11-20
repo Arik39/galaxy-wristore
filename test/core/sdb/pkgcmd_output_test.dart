@@ -32,6 +32,42 @@ spend time for pkgcmd is [16648]ms''';
     expect(result.success, isFalse);
     expect(result.code, '-24');
     expect(result.message, 'Image error');
+    expect(result.detail, isNull);
+    expect(result.reason, 'Image error (-24)');
+  });
+
+  // Built from the format in Tizen 4.0 and 5.5's pkg_cmd.c and app-installers, not captured from a watch: the
+  // installer sends "<code>:<reason>" and pkgcmd prints it from the colon on.
+  test('the installer\'s own reason comes from the error line', () {
+    const text = '''__return_cb req_id[1] pkg_type[tpk] pkgid[com.example.face] key[start] val[install]
+__return_cb req_id[1] pkg_type[tpk] pkgid[com.example.face] key[error] val[-12] error message: :Invalid certificate chain with certificate in signature.:<-6>\r
+__return_cb req_id[1] pkg_type[tpk] pkgid[com.example.face] key[end] val[fail]
+processing result : Check certificate error [-12] failed
+spend time for pkgcmd is [2210]ms''';
+    final (result, _) = _parse(text);
+    expect(result.success, isFalse);
+    expect(result.code, '-12');
+    expect(result.message, 'Check certificate error');
+    expect(result.detail, 'Invalid certificate chain with certificate in signature.');
+    expect(result.reason, 'Check certificate error (-12): Invalid certificate chain with certificate in signature');
+  });
+
+  test('a reason without the certificate check\'s number is kept whole', () {
+    final (result, _) = _parse(
+      'key[error] val[-12] error message: :Package with the same id and different certificate has been already '
+      'installed\nkey[end] val[fail]',
+    );
+    expect(result.code, '-12');
+    expect(result.message, isNull);
+    expect(result.detail, 'Package with the same id and different certificate has been already installed');
+    expect(result.reason, 'code -12: Package with the same id and different certificate has been already installed');
+  });
+
+  test('an empty reason and the watch\'s control characters are dropped', () {
+    expect(_parse('key[error] val[-27] error message: :\nkey[end] val[fail]').$1.detail, isNull);
+    final (result, _) = _parse('key[error] val[-1] error message: :Bad\u0007 thing${' x' * 500}\nkey[end] val[fail]');
+    expect(result.detail, startsWith('Bad thing x x'));
+    expect(result.detail!.length, 300);
   });
 
   test('a missing file gives code -5', () {
@@ -82,5 +118,27 @@ spend time for pkgcmd is [16648]ms''';
     final (result, _) = _parse('processing result : Bad\u0007 thing${' x' * 500} [-1] failed');
     expect(result.message, startsWith('Bad thing x x'));
     expect(result.message!.length, 300);
+  });
+
+  group('reason', () {
+    test('names the outcome with its code', () {
+      expect(const InstallResult(success: false, message: 'Image error', code: '-24').reason, 'Image error (-24)');
+      expect(const InstallResult(success: false, code: '-27').reason, 'code -27');
+      expect(const InstallResult(success: false, message: 'pkgcmd gave no result').reason, 'pkgcmd gave no result');
+      expect(const InstallResult(success: false).reason, 'no reason given');
+    });
+
+    test('adds the installer\'s reason unless it only repeats the name', () {
+      const signed = InstallResult(success: false, message: 'Signature error', code: '-14', detail: 'Unsigned app.');
+      expect(signed.reason, 'Signature error (-14): Unsigned app');
+      const same = InstallResult(success: false, message: 'Image error', code: '-24', detail: 'image error.');
+      expect(same.reason, 'Image error (-24)');
+      expect(const InstallResult(success: false, detail: 'Out of space').reason, 'Out of space');
+    });
+
+    test('never ends in a full stop, so a sentence can close it', () {
+      const result = InstallResult(success: false, message: 'Error.', code: '-1', detail: 'It failed. ');
+      expect(result.reason, 'Error. (-1): It failed');
+    });
   });
 }

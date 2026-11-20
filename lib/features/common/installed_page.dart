@@ -253,9 +253,7 @@ class _InstalledPageState extends State<InstalledPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          result.success
-              ? '${p.name} is removed from your watch.'
-              : 'The watch kept ${p.name}: ${result.message ?? result.code ?? 'no reason given'}.',
+          result.success ? '${p.name} is removed from your watch.' : 'The watch kept ${p.name}: ${result.reason}.',
         ),
       ),
     );

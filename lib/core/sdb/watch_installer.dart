@@ -7,8 +7,8 @@ import 'pkgcmd_output.dart';
 import 'sdb_session.dart';
 
 /// Installs and removes packages through `pkgcmd -w`, the mode that accepts store-signed packages, and reads what the
-/// watch has. Shell commands are built only from constants and values checked here, never from text inside a package
-/// or from the watch.
+/// watch has. A watch that cannot mount a package in that mode gets the normal install. Shell commands are built only
+/// from constants and values checked here, never from text inside a package or from the watch.
 class WatchInstaller {
   WatchInstaller(this._service, {this.remoteDir = defaultDir});
 
@@ -44,8 +44,13 @@ class WatchInstaller {
   /// starting with `-` and not only dots.
   static bool isPackageId(String text) => _packageId.hasMatch(text) && text.replaceAll('.', '').isNotEmpty;
 
+  /// The code of "Image error": `pkgcmd -w` could not mount the package, before any check of its signature. A Gear S3
+  /// on Tizen 4.0 answered every package so; a broken package gets it on any watch.
+  static const String _imageError = '-24';
+
   /// Sends [file] (a package of [type], `tpk` or `wgt`), installs it and removes the copy from the watch whatever
-  /// the outcome.
+  /// the outcome. When the watch cannot mount the package, the normal install tries it once more and its answer is
+  /// the one returned.
   Future<InstallResult> install(File file, String type, {void Function(InstallProgress progress)? onProgress}) async {
     if (type != 'tpk' && type != 'wgt') throw ArgumentError.value(type, 'type', 'Not a package type');
     final total = await file.length();
@@ -55,16 +60,10 @@ class WatchInstaller {
     await _service.shell('mkdir -p $remoteDir; rm -f $remoteDir/$_hex16.wgt $remoteDir/$_hex16.tpk');
     try {
       await _service.push(remote, file.openRead(), onProgress: (sent) => onProgress?.call(Uploading(sent, total)));
-      onProgress?.call(const Installing(null));
-      final output = PkgcmdOutput();
-      await _service.shell(
-        'pkgcmd -i -t $type -p $remote -w 2>&1',
-        onLine: (line) {
-          final percent = output.feed(line);
-          if (percent != null) onProgress?.call(Installing(percent));
-        },
-      );
-      return output.result();
+      final mountResult = await _pkgcmd('pkgcmd -i -t $type -p $remote -w 2>&1', onProgress);
+      if (mountResult.success || mountResult.code != _imageError) return mountResult;
+      // The normal install unpacks the package instead of mounting it, so it gets as far as the real checks
+      return await _pkgcmd('pkgcmd -i -t $type -p $remote 2>&1', onProgress);
     } finally {
       try {
         await _service.shell('rm -f $remote');
@@ -72,6 +71,20 @@ class WatchInstaller {
         // The outcome matters more than the leftover copy, which the next install removes
       }
     }
+  }
+
+  /// Runs one install [command] and reads the watch's answer, passing on its percentages.
+  Future<InstallResult> _pkgcmd(String command, void Function(InstallProgress progress)? onProgress) async {
+    onProgress?.call(const Installing(null));
+    final output = PkgcmdOutput();
+    await _service.shell(
+      command,
+      onLine: (line) {
+        final percent = output.feed(line);
+        if (percent != null) onProgress?.call(Installing(percent));
+      },
+    );
+    return output.result();
   }
 
   /// Every package the watch lists, system ones included (the list does not tell them apart). Names are cleaned for

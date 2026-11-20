@@ -89,14 +89,71 @@ void main() {
     );
   });
 
-  test('a refusal is returned and the file is still removed', () async {
+  test('a refusal is returned, not tried again, and the file is still removed', () async {
     final service = FakeService()
-      ..answers['pkgcmd -i'] = 'key[error] val[-24]\nkey[end] val[fail]\nprocessing result : Image error [-24] failed';
+      ..answers['pkgcmd -i'] =
+          'key[error] val[-12] error message: :Invalid certificate chain with certificate in signature.:<-6>\n'
+          'key[end] val[fail]\nprocessing result : Check certificate error [-12] failed';
     final result = await WatchInstaller(service).install(packageFile(), 'wgt');
     expect(result.success, isFalse);
-    expect(result.code, '-24');
-    expect(result.message, 'Image error');
+    expect(result.code, '-12');
+    expect(result.message, 'Check certificate error');
+    expect(result.detail, 'Invalid certificate chain with certificate in signature.');
+    expect(service.steps.where((step) => step.startsWith('pkgcmd')), hasLength(1));
     expect(service.steps.last, startsWith('rm -f '));
+  });
+
+  group('a package the watch cannot mount', () {
+    const imageError = 'key[error] val[-24]\nkey[end] val[fail]\nprocessing result : Image error [-24] failed';
+
+    String remoteOf(File file) =>
+        '/home/owner/share/tmp/sdk_tools/${sha256.convert(file.readAsBytesSync()).toString().substring(0, 16)}.wgt';
+
+    test('gets the normal install, and its success counts', () async {
+      final file = packageFile();
+      final remote = remoteOf(file);
+      final service = FakeService()
+        ..answers['pkgcmd -i -t wgt -p $remote -w'] = imageError
+        ..answers['pkgcmd -i -t wgt -p $remote 2>&1'] = ok;
+      final events = <InstallProgress>[];
+      final result = await WatchInstaller(service).install(file, 'wgt', onProgress: events.add);
+
+      expect(result.success, isTrue);
+      expect(service.steps.skip(2), [
+        'pkgcmd -i -t wgt -p $remote -w 2>&1',
+        'pkgcmd -i -t wgt -p $remote 2>&1',
+        'rm -f $remote',
+      ]);
+      expect(events.whereType<Installing>().map((event) => event.percent), [null, null, 40, 90]);
+    });
+
+    test('gets the normal install\'s refusal as the answer', () async {
+      final file = packageFile();
+      final remote = remoteOf(file);
+      final service = FakeService()
+        ..answers['pkgcmd -i -t wgt -p $remote -w'] = imageError
+        ..answers['pkgcmd -i -t wgt -p $remote 2>&1'] =
+            'key[error] val[-12] error message: :Invalid certificate chain with certificate in signature.:<-6>\n'
+            'key[end] val[fail]\nprocessing result : Check certificate error [-12] failed';
+      final result = await WatchInstaller(service).install(file, 'wgt');
+
+      expect(result.success, isFalse);
+      expect(result.reason, 'Check certificate error (-12): Invalid certificate chain with certificate in signature');
+      expect(service.steps.last, 'rm -f $remote');
+    });
+
+    test('a lost connection during the second try is raised, cleanup still runs', () async {
+      final file = packageFile();
+      final remote = remoteOf(file);
+      final service = FakeService()
+        ..answers['pkgcmd -i -t wgt -p $remote -w'] = imageError
+        ..failOn = 'pkgcmd -i -t wgt -p $remote 2>&1';
+      await expectLater(
+        WatchInstaller(service).install(file, 'wgt'),
+        throwsA(isA<WatchException>().having((e) => e.error, 'error', WatchError.lost)),
+      );
+      expect(service.steps.last, 'rm -f $remote');
+    });
   });
 
   test('a lost connection during the install is raised, cleanup does not hide it', () async {

@@ -161,13 +161,36 @@ class Installing extends InstallProgress {
   final int? percent;
 }
 
-/// The watch package manager's answer. When it refuses, [message] and [code] are its own words, shown as they are.
+/// The watch package manager's answer. When it refuses, [message], [code] and [detail] are its own words, shown as
+/// they are.
 class InstallResult {
-  const InstallResult({required this.success, this.message, this.code});
+  const InstallResult({required this.success, this.message, this.code, this.detail});
 
   final bool success;
+
+  /// The package manager's name for the outcome, such as `Check certificate error`.
   final String? message;
+
+  /// Its number for the outcome, such as `-12`.
   final String? code;
+
+  /// The installer's own reason, when it gave one, such as `Invalid certificate chain with certificate in signature.`
+  final String? detail;
+
+  /// The answer as one line for the screen, such as `Check certificate error (-12): Invalid certificate chain with
+  /// certificate in signature`. It has no full stop at the end, so a sentence can close it.
+  String get reason {
+    final name = message == null ? (code == null ? null : 'code $code') : (code == null ? message : '$message ($code)');
+    // A reason that only repeats the name adds nothing
+    final bare = _bare(detail ?? '');
+    final extra = bare.isEmpty || bare == _bare(message ?? '') ? null : detail;
+    final text = [?name, ?extra].join(': ').replaceFirst(_end, '');
+    return text.isEmpty ? 'no reason given' : text;
+  }
+
+  static final RegExp _end = RegExp(r'[\s.]+$');
+
+  static String _bare(String text) => text.replaceFirst(_end, '').toLowerCase();
 }
 
 /// An authorized conversation with one watch. Only one exists at a time: the watch serves one host at a time.
@@ -186,7 +209,8 @@ abstract interface class WatchConnection {
   Future<WatchStatus> status();
 
   /// Sends a `.tpk` or `.wgt` and installs it with the watch's own package manager (`pkgcmd -w`, which accepts
-  /// store-signed packages). The package is never modified.
+  /// store-signed packages, or the normal install on a watch that cannot mount the package). The package is never
+  /// modified.
   Future<InstallResult> install(File package, {void Function(InstallProgress progress)? onProgress});
 
   /// Removes a downloaded package (and its data on the watch).

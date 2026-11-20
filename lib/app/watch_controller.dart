@@ -218,7 +218,7 @@ class WatchController extends ChangeNotifier {
       _busy = false;
       final result = await install(temp, name: name, startAt: 0.35);
       if (result == null) return problem ?? 'Your watch could not be reached.';
-      return result.success ? null : 'Your watch refused it: ${result.message ?? result.code ?? 'no reason given'}.';
+      return result.success ? null : 'Your watch refused it: ${result.reason}.';
     } on CatalogException catch (e) {
       return 'The download failed: ${e.message}';
     } finally {

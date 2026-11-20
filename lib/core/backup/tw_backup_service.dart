@@ -392,8 +392,7 @@ class TwBackupService implements BackupService {
         if (outcome.success) {
           result.installed.add(package.name);
         } else {
-          final words = [outcome.message, outcome.code].nonNulls.join(' ');
-          result.failed.add('${package.name}: the watch refused it ($words)');
+          result.failed.add('${package.name}: the watch refused it: ${outcome.reason}');
         }
       } on InvalidPackageException catch (error) {
         result.failed.add('${package.name}: not a Tizen package (${error.message})');
