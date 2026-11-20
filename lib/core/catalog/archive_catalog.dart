@@ -23,7 +23,7 @@ class ArchiveCatalog implements CatalogApi {
   ArchiveCatalog({http.Client? client, this.userAgent = defaultUserAgent}) : _client = client ?? http.Client();
 
   static const String baseUrl = 'https://tizen-archive.com';
-  static const String defaultUserAgent = 'galaxy-wristore/1.0.0';
+  static const String defaultUserAgent = 'galaxy-wristore/1.0.1';
 
   final String userAgent;
   final http.Client _client;
